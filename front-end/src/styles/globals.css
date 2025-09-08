@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --color-primary: #cf2e2e;
+  --color-primary-light: #fca5a5;
+  --color-primary-dark: #b91c1c;
+  --color-background: #fff;
+  --color-background-muted: #f8f8f8;
+  --color-border: #e5e7eb;
+  --color-card: #fff;
+  --color-card-muted: #f3f3f3;
+  --color-text: #222;
+  --color-text-muted: #888;
+  --color-footer-bg: #f8f8f8;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+@keyframes bar-shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Quill read-only helpers so content pasted from the admin editor aligns properly on public pages */
+.ql-align-center {
+  text-align: center;
+}
+.ql-align-right {
+  text-align: right;
+}
+.ql-align-justify {
+  text-align: justify;
+}
+.ql-direction-rtl {
+  direction: rtl;
+}
+
+/* Indentation levels used by Quill for lists/blocks */
+.ql-indent-1 {
+  padding-left: 3em;
+}
+.ql-indent-2 {
+  padding-left: 6em;
+}
+.ql-indent-3 {
+  padding-left: 9em;
+}
+.ql-indent-4 {
+  padding-left: 12em;
+}
+.ql-indent-5 {
+  padding-left: 15em;
+}
+.ql-indent-6 {
+  padding-left: 18em;
+}
+.ql-indent-7 {
+  padding-left: 21em;
+}
+.ql-indent-8 {
+  padding-left: 24em;
+}
+.ql-indent-9 {
+  padding-left: 27em;
+}
+
+/* Fallback when Quill stores list semantics as data attributes on block elements */
+[data-list="bullet"] {
+  display: list-item;
+  list-style-type: disc;
+  margin-left: 1.25rem;
+}
+[data-list="ordered"] {
+  display: list-item;
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+}
