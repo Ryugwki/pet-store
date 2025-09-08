@@ -122,29 +122,7 @@ export default function SignInPage() {
                 Sign up
               </Link>
             </div>
-            <div className="relative mt-6">
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground text-gray-500">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                type="button"
-                className="hover:bg-green-300 hover:text-white"
-              >
-                Google
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="hover:bg-blue-300 hover:text-white"
-              >
-                Facebook
-              </Button>
-            </div>
+           
             <div className="mt-6 flex items-center justify-center">
               <Lock className="h-4 w-4 text-muted-foreground mr-1" />
               <span className="text-xs text-muted-foreground">

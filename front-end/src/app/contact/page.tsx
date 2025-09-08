@@ -5,7 +5,6 @@ import Section from "@/components/shared/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, MapPin, Copy, Check, MessageSquare } from "lucide-react";
 
 type Contact = {
@@ -83,10 +82,10 @@ export default function ContactPage() {
 
   return (
     <Section title="Contact">
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* left column: details and actions */}
         <div className="space-y-6">
-          <Card className="p-4 md:p-5 space-y-4 bg-gradient-to-br from-red-50/40 to-transparent">
+          <Card className="p-4 md:p-5 space-y-3 md:space-y-4 bg-gradient-to-br from-red-50/40 to-transparent">
             {loading ? (
               <div className="space-y-3">
                 <Skeleton className="h-5 w-40" />
@@ -94,7 +93,7 @@ export default function ContactPage() {
                 <Skeleton className="h-4 w-3/4" />
               </div>
             ) : contact.content ? (
-              <p className="text-muted-foreground whitespace-pre-line text-xl font-bold">
+              <p className="text-muted-foreground whitespace-pre-line text-base md:text-xl font-semibold md:font-bold">
                 {contact.content}
               </p>
             ) : (
@@ -115,7 +114,7 @@ export default function ContactPage() {
                     </span>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-red-700"
                     >
                       {contact.email}
                     </a>
@@ -147,7 +146,7 @@ export default function ContactPage() {
                     </span>
                     <a
                       href={`tel:${contact.phone}`}
-                      className="truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-red-700"
                     >
                       {contact.phone}
                     </a>
@@ -178,7 +177,7 @@ export default function ContactPage() {
                       <MapPin className="h-4 w-4" />
                     </span>
                     <p
-                      className="text-sm leading-6 truncate"
+                      className="text-sm leading-6 break-words"
                       title={contact.address}
                     >
                       {contact.address}
@@ -192,7 +191,10 @@ export default function ContactPage() {
                         className="bg-red-700 text-white hover:bg-red-600"
                       >
                         <a href={mapsHref} target="_blank" rel="noreferrer">
-                          Open in Google Maps
+                          <span className="hidden sm:inline">
+                            Open in Google Maps
+                          </span>
+                          <span className="sm:hidden inline">Open Maps</span>
                         </a>
                       </Button>
                     )}
@@ -224,7 +226,7 @@ export default function ContactPage() {
                     </span>
                     <a
                       href={`imessage:${encodeURIComponent(contact.imessage)}`}
-                      className="truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-red-700"
                       title={contact.imessage}
                     >
                       iMessage: {contact.imessage}

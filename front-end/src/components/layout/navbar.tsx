@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { settingsAPI } from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/cart";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function Header() {
   const [siteName, setSiteName] = useState<string>(
     "LilyTrinh & DrogonCoon Cattery"
   );
+  const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleProfileClick = useCallback(() => {
     router.push("/profile");
@@ -47,8 +49,21 @@ export default function Header() {
   }, [router]);
 
   const handleLogoutClick = useCallback(() => {
+    // Clear any existing timer to avoid multiple redirects
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+    // Execute logout immediately
     logout();
-    router.push("/");
+    // After 3 seconds, navigate to homepage and force a reload
+    logoutTimerRef.current = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.location.assign("/");
+      } else {
+        router.push("/");
+      }
+    }, 3000);
   }, [logout, router]);
 
   // Prevent background scroll when mobile menu is open
@@ -61,6 +76,15 @@ export default function Header() {
       };
     }
   }, [isMenuOpen]);
+
+  // Cleanup logout timer on unmount
+  useEffect(() => {
+    return () => {
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+      }
+    };
+  }, []);
 
   // Fetch site name from settings
   useEffect(() => {
@@ -79,7 +103,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-background border-b border-border shadow-sm transition-colors duration-200">
+    <header className="bg-background border-b border-border shadow-sm transition-colors duration-200 relative z-50 overflow-visible">
       <div className="relative px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center">
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
@@ -192,7 +216,8 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-48 mt-2 shadow-lg border border-border bg-popover rounded-lg p-1 bg-white"
+                  sideOffset={8}
+                  className="w-48 shadow-lg border border-gray-200 bg-popover rounded-lg p-1 bg-white"
                 >
                   <DropdownMenuItem
                     onClick={handleProfileClick}
@@ -259,43 +284,6 @@ export default function Header() {
                 <Menu className="h-5 w-5" />
               )}
             </Button>
-            {!isAuthenticated ? (
-              <Link href="/sign-in">
-                <Button variant="ghost" size="icon">
-                  <UserIcon className="h-5 w-5" />
-                  <span className="sr-only">Account</span>
-                </Button>
-              </Link>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <UserIcon className="h-5 w-5" />
-                    <span className="sr-only">Account Menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={handleProfileClick}>
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSettingsClick}>
-                    Settings
-                  </DropdownMenuItem>
-                  {user?.role === "admin" && (
-                    <DropdownMenuItem onClick={handleAdminClick}>
-                      Admin
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={handleLogoutClick}
-                  >
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </div>
         </div>
       </div>
@@ -303,7 +291,7 @@ export default function Header() {
       {/* Mobile menu */}
       {isMenuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 z-[100] bg-white md:hidden overflow-y-auto">
-          <nav className="container grid gap-6 p-6">
+          <nav className="container grid gap-3 p-6">
             <Link
               href="/"
               className="flex items-center gap-2 text-lg font-semibold"
@@ -346,6 +334,7 @@ export default function Header() {
             >
               Contact Us
             </Link>
+            <Separator className="my-2 " />
             {!isAuthenticated ? (
               <>
                 <Link
@@ -391,7 +380,7 @@ export default function Header() {
                 <button
                   className="text-left text-red-600 font-semibold"
                   onClick={() => {
-                    logout();
+                    handleLogoutClick();
                     setIsMenuOpen(false);
                   }}
                 >

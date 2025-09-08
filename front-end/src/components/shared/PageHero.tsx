@@ -35,13 +35,13 @@ export default function PageHero({
 
   return (
     <section className="relative">
-      <div className="relative w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] xl:h-[640px]">
+      <div className="relative w-full h-[220px] sm:h-[300px] md:h-[380px] lg:h-[420px] xl:h-[520px]">
         <Image
           src={imageSrc}
           alt={title}
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
         {/* Readability overlay */}
@@ -51,11 +51,11 @@ export default function PageHero({
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
-              <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white drop-shadow">
                 {title}
               </h1>
               {subtitle && (
-                <p className="mt-3 md:mt-4 text-white/90 text-base md:text-lg">
+                <p className="mt-2 md:mt-4 text-white/90 text-sm md:text-lg">
                   {subtitle}
                 </p>
               )}
