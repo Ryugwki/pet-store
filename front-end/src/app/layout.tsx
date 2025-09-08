@@ -12,6 +12,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "PetStore",
   description: "PetStore App",
+  icons: {
+    // Use the logo under public/images/logo/paw-9.png
+    icon: [{ url: "/images/logo/paw-9.png", type: "image/png" }],
+    apple: [{ url: "/images/logo/paw-9.png" }],
+  },
 };
 
 export default function RootLayout({
