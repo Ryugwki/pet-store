@@ -1,6 +1,7 @@
 import axios, { AxiosRequestHeaders } from "axios";
 import { useAuthStore } from "@/store/cart";
 import { PetFilters } from "@/types";
+import { API_BASE_URL } from "@/constants";
 
 // API parameter types
 interface QueryParams {
@@ -26,7 +27,7 @@ interface UserData {
 
 // Create axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

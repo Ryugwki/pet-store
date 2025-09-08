@@ -11,11 +11,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+import { API_BASE_URL } from "@/constants";
 
 async function getPet(id: string): Promise<Pet> {
-  const res = await fetch(`${API_URL}/pets/${id}`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE_URL}/pets/${id}`, { cache: "no-store" });
   if (res.status === 404) notFound();
   if (!res.ok) throw new Error("Failed to fetch pet");
   const data = await res.json();
