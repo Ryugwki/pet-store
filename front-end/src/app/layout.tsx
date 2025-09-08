@@ -10,8 +10,8 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PetStore",
-  description: "PetStore App",
+  title: "LilyDrogon",
+  description: "LilyDrogon Cattery",
   icons: {
     // Use the logo under public/images/logo/paw-9.png
     icon: [{ url: "/images/logo/paw-9.png", type: "image/png" }],
