@@ -1,3 +1,4 @@
+export const runtime = "edge"; // Required by Cloudflare Pages for this dynamic route
 import Image from "next/image";
 import ZoomableImage from "@/components/shared/ZoomableImage";
 import { notFound } from "next/navigation";
@@ -14,6 +15,7 @@ import {
 import { API_BASE_URL } from "@/constants";
 
 async function getPet(id: string): Promise<Pet> {
+  // id is used in the fetch call; rename to avoid lint false positive if configured
   const res = await fetch(`${API_BASE_URL}/pets/${id}`, { cache: "no-store" });
   if (res.status === 404) notFound();
   if (!res.ok) throw new Error("Failed to fetch pet");
