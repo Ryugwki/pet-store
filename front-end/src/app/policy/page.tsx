@@ -1,10 +1,16 @@
+"use client";
 import Section from "@/components/shared/Section";
+import { useCurrency } from "@/lib/currency";
 
 export const metadata = {
   title: "Policy",
 };
 
 export default function PolicyPage() {
+  const { currency, format } = useCurrency();
+  // Base pricing in USD; simple example conversion for VND (fixed rate). Replace with real rates if needed.
+  const baseUsd = 3000;
+  const amount = currency === "VND" ? baseUsd * 25000 : baseUsd;
   return (
     <>
       <Section title="Policy" center>
@@ -35,7 +41,8 @@ export default function PolicyPage() {
             preferred gender, coat type, and color (subject to availability).
           </li>
           <li>
-            <span className="font-semibold">Price:</span> $3000 for all colors.
+            <span className="font-semibold">Price:</span> {format(amount)} for
+            all colors.
           </li>
         </ul>
       </Section>

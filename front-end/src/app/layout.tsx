@@ -6,6 +6,8 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import HideOnAdmin from "@/components/layout/HideOnAdmin";
 import { Toaster } from "@/components/ui/sonner";
+import ThemeProvider from "@/components/layout/theme-provider";
+import I18nProvider from "@/components/layout/i18n-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,16 +29,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning={true}>
-        <div className="flex min-h-screen flex-col">
-          <HideOnAdmin>
-            <Navbar />
-          </HideOnAdmin>
-          <main className="flex-1">{children}</main>
-          <HideOnAdmin>
-            <Footer />
-          </HideOnAdmin>
-        </div>
-        <Toaster richColors closeButton position="top-right" />
+        <ThemeProvider>
+          <I18nProvider>
+            <div className="flex min-h-screen flex-col">
+              <HideOnAdmin>
+                <Navbar />
+              </HideOnAdmin>
+              <main className="flex-1">{children}</main>
+              <HideOnAdmin>
+                <Footer />
+              </HideOnAdmin>
+            </div>
+            <Toaster richColors closeButton position="top-right" />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
