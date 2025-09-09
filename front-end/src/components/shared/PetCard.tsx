@@ -16,8 +16,8 @@ export default function PetCard({ pet, href }: PetCardProps) {
   );
 
   return (
-    <div className="relative bg-white rounded-xl shadow hover:shadow-md transition-shadow overflow-hidden flex flex-col w-full max-w-[320px] group">
-      <div className="relative w-full aspect-[4/3] bg-gray-50">
+    <div className="relative bg-card text-foreground border border-border rounded-xl shadow hover:shadow-md transition-shadow overflow-hidden flex flex-col w-full max-w-[320px] group">
+      <div className="relative w-full aspect-[4/3] bg-muted">
         <Link
           href={href}
           aria-label={`Open ${pet.name} details`}
@@ -42,7 +42,7 @@ export default function PetCard({ pet, href }: PetCardProps) {
           </div>
         )}
         <h3 className="text-lg font-semibold">{pet.name}</h3>
-        <p className="text-sm text-gray-500">{pet.breed}</p>
+        <p className="text-sm text-muted-foreground">{pet.breed}</p>
         <Link
           href={href}
           aria-label={`View details of ${pet.name}`}

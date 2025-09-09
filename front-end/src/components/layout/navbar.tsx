@@ -14,6 +14,8 @@ import {
   LogOut,
   ChevronDown,
   LayoutDashboard,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/cart";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { usePreferencesStore } from "@/store/preferences";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,6 +38,9 @@ export default function Header() {
     "LilyTrinh & DrogonCoon Cattery"
   );
   const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const theme = usePreferencesStore((s) => s.theme);
+  const setTheme = usePreferencesStore((s) => s.setTheme);
+  const isDark = theme === "dark";
 
   const handleProfileClick = useCallback(() => {
     router.push("/profile");
@@ -159,14 +165,52 @@ export default function Header() {
 
         {/* Actions right */}
         <div className="flex items-center justify-end space-x-2">
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center gap-2">
+            {/* Theme segmented toggle (desktop) */}
+            <div
+              role="group"
+              aria-label="Theme"
+              className="relative flex items-center rounded-full border border-border bg-card p-0.5"
+              title={isDark ? "Dark mode" : "Light mode"}
+            >
+              <span
+                aria-hidden
+                className={`absolute inset-y-0 my-0.5 w-1/2 rounded-full bg-muted transition-transform duration-200 ${
+                  isDark ? "translate-x-full" : "translate-x-0"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                aria-label="Switch to light"
+                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                  !isDark
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Sun className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                aria-label="Switch to dark"
+                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                  isDark
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Moon className="size-4" />
+              </button>
+            </div>
             {!isAuthenticated ? (
               <div className="flex space-x-2">
                 <Link href="/sign-in">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className=" text-black hover:bg-gray-200 transition-colors"
+                    className=" text-foreground hover:bg-muted transition-colors"
                   >
                     Sign In
                   </Button>
@@ -184,7 +228,7 @@ export default function Header() {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Card className="group flex items-center gap-0 p-2 rounded-x-lg border border-gray-200 hover:shadow-md transition-all duration-200 bg-card">
+                  <Card className="group flex items-center gap-0 p-2 rounded-x-lg border border-border hover:shadow-md transition-all duration-200 bg-card">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
                         {user?.avatar ? (
@@ -217,24 +261,24 @@ export default function Header() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={8}
-                  className="w-48 shadow-lg border border-gray-200 bg-popover rounded-lg p-1 bg-white"
+                  className="w-48 shadow-lg border border-border bg-card text-foreground rounded-lg p-1"
                 >
                   <DropdownMenuItem
                     onClick={handleProfileClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors duration-200 cursor-pointer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
                   >
                     <UserIcon size={16} className="text-muted-foreground" />
-                    <span className="text-sm font-medium text-popover-foreground">
+                    <span className="text-sm font-medium text-foreground">
                       Profile
                     </span>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onClick={handleSettingsClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors duration-200 cursor-pointer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
                   >
                     <Settings size={16} className="text-muted-foreground" />
-                    <span className="text-sm font-medium text-popover-foreground">
+                    <span className="text-sm font-medium text-foreground">
                       Settings
                     </span>
                   </DropdownMenuItem>
@@ -242,19 +286,19 @@ export default function Header() {
                   {user?.role === "admin" && (
                     <DropdownMenuItem
                       onClick={handleAdminClick}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors duration-200 cursor-pointer"
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
                     >
                       <LayoutDashboard
                         size={16}
                         className="text-muted-foreground"
                       />
-                      <span className="text-sm font-medium text-popover-foreground">
+                      <span className="text-sm font-medium text-foreground">
                         Admin
                       </span>
                     </DropdownMenuItem>
                   )}
 
-                  <DropdownMenuSeparator className="my-1 bg-gray-300" />
+                  <DropdownMenuSeparator className="my-1 bg-border" />
 
                   <DropdownMenuItem
                     variant="destructive"
@@ -270,7 +314,44 @@ export default function Header() {
               </DropdownMenu>
             )}
           </div>
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-1">
+            {/* Theme segmented toggle (mobile) */}
+            <div
+              role="group"
+              aria-label="Theme"
+              className="relative flex items-center rounded-full border border-border bg-card p-0.5"
+            >
+              <span
+                aria-hidden
+                className={`absolute inset-y-0 my-0.5 w-1/2 rounded-full bg-muted transition-transform duration-200 ${
+                  isDark ? "translate-x-full" : "translate-x-0"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                aria-label="Switch to light"
+                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                  !isDark
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Sun className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                aria-label="Switch to dark"
+                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                  isDark
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Moon className="size-4" />
+              </button>
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -290,7 +371,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="fixed inset-x-0 top-16 bottom-0 z-[100] bg-white md:hidden overflow-y-auto">
+        <div className="fixed inset-x-0 top-16 bottom-0 z-[100] bg-background md:hidden overflow-y-auto">
           <nav className="container grid gap-3 p-6">
             <Link
               href="/"

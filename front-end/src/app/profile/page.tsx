@@ -126,7 +126,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       <CenteredAlert banner={banner} onClose={() => setBanner(null)} />
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
@@ -135,16 +135,16 @@ export default function ProfilePage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-lg hover:bg-sky-50"
+              className="rounded-lg hover:bg-muted"
             >
-              <ArrowLeft size={20} className="text-gray-600" />
+              <ArrowLeft size={20} className="text-muted-foreground" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
+            <h1 className="text-2xl font-semibold text-foreground">
               Profile Settings
             </h1>
-            <p className="text-gray-500">
+            <p className="text-muted-foreground">
               Manage your account information and preferences
             </p>
           </div>
@@ -155,22 +155,22 @@ export default function ProfilePage() {
           <Card className="shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="text-center">
               <div className="relative mx-auto">
-                <Avatar className="h-24 w-24 border-4 border-sky-200 shadow-md">
+                <Avatar className="h-24 w-24 border-4 border-border shadow-md">
                   <AvatarImage
                     src={(isEditing ? edited.avatar : profile?.avatar) || ""}
                     alt={profile?.name || "User avatar"}
                   />
-                  <AvatarFallback className="bg-sky-100 text-sky-700 font-semibold text-xl">
+                  <AvatarFallback className="bg-muted text-foreground font-semibold text-xl">
                     {(profile?.name?.[0] || "U").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute -bottom-2 -right-2 rounded-full bg-white shadow-md hover:bg-sky-50 border border-gray-200"
+                  className="absolute -bottom-2 -right-2 rounded-full bg-card shadow-md hover:bg-muted border border-border"
                   onClick={pickAvatar}
                 >
-                  <Camera size={16} className="text-gray-600" />
+                  <Camera size={16} className="text-muted-foreground" />
                 </Button>
                 <input
                   ref={fileRef}
@@ -188,12 +188,12 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3 text-sm">
-                <Mail size={16} className="text-gray-500" />
-                <span className="text-gray-600">{profile?.email}</span>
+                <Mail size={16} className="text-muted-foreground" />
+                <span className="text-foreground/90">{profile?.email}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Calendar size={16} className="text-gray-500" />
-                <span className="text-gray-600">
+                <Calendar size={16} className="text-muted-foreground" />
+                <span className="text-foreground/90">
                   Joined{" "}
                   {profile?.createdAt
                     ? new Date(profile.createdAt).toLocaleDateString()
@@ -201,8 +201,8 @@ export default function ProfilePage() {
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Shield size={16} className="text-gray-500" />
-                <span className="text-gray-600">
+                <Shield size={16} className="text-muted-foreground" />
+                <span className="text-foreground/90">
                   {profile?.role === "admin"
                     ? "Administrator Access"
                     : "Customer"}
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                 {!isEditing ? (
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-sky-500 hover:bg-sky-600 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Edit Profile
                   </Button>
@@ -228,14 +228,14 @@ export default function ProfilePage() {
                     <Button
                       variant="outline"
                       onClick={onCancel}
-                      className="border-gray-300 hover:bg-gray-50"
+                      className="border-border hover:bg-muted"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={onSave}
                       disabled={saving}
-                      className="bg-sky-500 hover:bg-sky-600 text-white"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
                     >
                       <Save size={16} className="mr-2" />
                       {saving ? "Saving..." : "Save Changes"}
@@ -257,11 +257,7 @@ export default function ProfilePage() {
                         setEdited((p) => ({ ...p, name: e.target.value }))
                       }
                       disabled={!isEditing}
-                      className={`${
-                        !isEditing
-                          ? "bg-gray-50"
-                          : "focus:border-sky-400 focus:ring-sky-400"
-                      }`}
+                      className="disabled:bg-muted/40"
                     />
                   </div>
                 </div>
@@ -270,7 +266,7 @@ export default function ProfilePage() {
 
                 {/* Contact Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Contact Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -283,7 +279,7 @@ export default function ProfilePage() {
                         type="email"
                         value={profile?.email || ""}
                         disabled
-                        className="bg-gray-50"
+                        className="disabled:bg-muted/40"
                       />
                     </div>
                   </div>
@@ -293,10 +289,10 @@ export default function ProfilePage() {
 
                 {/* Address Information (not available) */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Address Information
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Address details are not available in your account yet.
                   </p>
                 </div>
@@ -305,7 +301,7 @@ export default function ProfilePage() {
 
                 {/* Account Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Account Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -317,7 +313,7 @@ export default function ProfilePage() {
                         id="role"
                         value={profile?.role || ""}
                         disabled
-                        className="bg-gray-50"
+                        className="disabled:bg-muted/40"
                       />
                     </div>
                     <div className="space-y-2">
@@ -332,7 +328,7 @@ export default function ProfilePage() {
                             : ""
                         }
                         disabled
-                        className="bg-gray-50"
+                        className="disabled:bg-muted/40"
                       />
                     </div>
                   </div>
@@ -348,19 +344,19 @@ export default function ProfilePage() {
               <CardContent className="space-y-4">
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-gray-300 hover:bg-gray-50"
+                  className="w-full justify-start border-border hover:bg-muted"
                 >
                   Change Password
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-gray-300 hover:bg-gray-50"
+                  className="w-full justify-start border-border hover:bg-muted"
                 >
                   Two-Factor Authentication
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-gray-300 hover:bg-gray-50"
+                  className="w-full justify-start border-border hover:bg-muted"
                 >
                   Login History
                 </Button>

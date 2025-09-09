@@ -118,7 +118,15 @@ export default function HomePage() {
       {/* Admin-managed homepage sections with Featured inserted at selected position */}
       {sections.map((sec, idx) => {
         const themeClass = `themed-${sec._id || idx}`;
-        const bg = sec.bgColor || "transparent";
+        // Normalize admin-provided colors so white becomes theme-aware in dark mode
+        const norm = (sec.bgColor || "").trim().toLowerCase();
+        const isWhite =
+          norm === "#fff" ||
+          norm === "#ffffff" ||
+          norm === "white" ||
+          norm === "rgb(255,255,255)" ||
+          norm === "rgba(255,255,255,1)";
+        const bg = isWhite ? "var(--color-card)" : sec.bgColor || "transparent";
         const color = sec.textColor || "inherit";
         const titleSize = sec.fontSize ? `${sec.fontSize}px` : undefined;
         const key = sec._id || `${sec.title}-${sec.order}`;
@@ -132,6 +140,19 @@ export default function HomePage() {
                 .${themeClass} {
                   background-color: ${bg};
                   color: ${color};
+                }
+                /* In dark mode, remove inline white/highlight backgrounds pasted from editors */
+                :global(.dark) .${themeClass} [style*="background"] {
+                  background: transparent !important;
+                }
+                :global(.dark) .${themeClass} [style*="background-color"] {
+                  background-color: transparent !important;
+                }
+                :global(.dark) .${themeClass} [class*="ql-bg-"] {
+                  background-color: transparent !important;
+                }
+                :global(.dark) .${themeClass} mark {
+                  background: transparent !important;
                 }
                 .${themeClass} ul {
                   list-style: disc !important;
@@ -182,7 +203,7 @@ export default function HomePage() {
                 }
               `}</style>
               <div
-                className={`rounded-md border border-gray-200 px-6 py-7 md:px-8 md:py-9 ${themeClass}`}
+                className={`rounded-md border border-border px-6 py-7 md:px-8 md:py-9 ${themeClass}`}
               >
                 {sec.title && (
                   <>
@@ -210,12 +231,12 @@ export default function HomePage() {
 
       {/* Cat registries section */}
       <Section>
-        <div className="rounded-md border border-gray-200 px-6 py-7 md:px-8 md:py-9">
+        <div className="rounded-md border border-border px-6 py-7 md:px-8 md:py-9">
           <h2 className="text-center font-extrabold text-red-700 text-3xl">
             Cat registries We Work With
           </h2>
           <div className="h-1 w-52 rounded-full mx-auto mt-2 mb-6 bg-red-700" />
-          <p className="text-gray-700 text-xl text-center md:text-center">
+          <p className="text-muted-foreground text-xl text-center md:text-center">
             We register our cat & kittens with reputable associations.
           </p>
           <div className="mt-6 space-y-5">
@@ -228,7 +249,7 @@ export default function HomePage() {
                 className="shrink-0"
                 unoptimized
               />
-              <span className="text-xl text-gray-800">
+              <span className="text-xl text-foreground">
                 World Cat Federation
               </span>
             </div>
@@ -241,7 +262,7 @@ export default function HomePage() {
                 className="shrink-0"
                 unoptimized
               />
-              <span className="text-xl text-gray-800">
+              <span className="text-xl text-foreground">
                 Cat Fanciers Federation
               </span>
             </div>
@@ -310,11 +331,18 @@ function FeaturedBlock({
                   (pet as unknown as { updatedAt?: string }).updatedAt ??
                   new Date().toISOString(),
               };
+              const segRaw = (pet.category || "").toString().toLowerCase();
+              const segment =
+                segRaw === "kings"
+                  ? "kings"
+                  : segRaw === "queens"
+                  ? "queens"
+                  : "kittens";
               return (
                 <PetCard
                   key={mapped.id}
                   pet={mapped}
-                  href={`/kittens/${mapped.id}`}
+                  href={`/${segment}/${mapped.id}`}
                 />
               );
             })}
@@ -337,6 +365,64 @@ function HtmlContent({
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
+
+    // Helper to strip inline backgrounds that are white-ish
+    const sanitizeBackgrounds = (node: ParentNode) => {
+      const isDark = document.documentElement.classList.contains("dark");
+      if (!isDark) return;
+      const whiteVals = new Set([
+        "#fff",
+        "#ffffff",
+        "white",
+        "rgb(255,255,255)",
+        "rgba(255,255,255,1)",
+      ]);
+      // Any element with style containing background or background-color
+      Array.from(node.querySelectorAll<HTMLElement>("[style]"))
+        .filter((el) => /background/i.test(el.getAttribute("style") || ""))
+        .forEach((el) => {
+          const bg = (el.style.background || "").replace(/\s+/g, "");
+          const bgc = (el.style.backgroundColor || "").replace(/\s+/g, "");
+          if (!bg && !bgc) {
+            // Still enforce transparency when any background is present in style attribute
+            el.style.setProperty("background", "transparent", "important");
+            el.style.setProperty(
+              "background-color",
+              "transparent",
+              "important"
+            );
+            return;
+          }
+          if (
+            whiteVals.has(bgc.toLowerCase()) ||
+            whiteVals.has(bg.toLowerCase())
+          ) {
+            el.style.removeProperty("background");
+            el.style.removeProperty("background-color");
+            el.style.setProperty("background", "transparent", "important");
+            el.style.setProperty(
+              "background-color",
+              "transparent",
+              "important"
+            );
+          } else {
+            // Force transparent in dark if any background defined
+            el.style.setProperty("background", "transparent", "important");
+            el.style.setProperty(
+              "background-color",
+              "transparent",
+              "important"
+            );
+          }
+        });
+      // Quill background classes and mark
+      Array.from(
+        node.querySelectorAll<HTMLElement>('[class*="ql-bg-"], mark')
+      ).forEach((el) => {
+        el.style.setProperty("background", "transparent", "important");
+        el.style.setProperty("background-color", "transparent", "important");
+      });
+    };
     // 1) Convert Quill-style paragraphs with data-list attr into real lists
     const toProcess = Array.from(
       root.querySelectorAll<HTMLElement>("p[data-list], div[data-list]")
@@ -437,6 +523,27 @@ function HtmlContent({
       }
       i++;
     }
+
+    // Initial sanitize and observe future changes
+    sanitizeBackgrounds(root);
+    const mo = new MutationObserver((records) => {
+      for (const r of records) {
+        if (r.type === "childList") {
+          r.addedNodes.forEach((n) => {
+            if (n.nodeType === 1) sanitizeBackgrounds(n as ParentNode);
+          });
+        } else if (r.type === "attributes" && r.target) {
+          sanitizeBackgrounds(r.target.parentNode || root);
+        }
+      }
+    });
+    mo.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
+    return () => mo.disconnect();
   }, [html]);
   return (
     <div

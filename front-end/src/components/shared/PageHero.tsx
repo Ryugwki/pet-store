@@ -19,13 +19,13 @@ export default function PageHero({
   if (!imageSrc) {
     // Fallback when no image: simple contained header
     return (
-      <section className="bg-[#f8f8f8]">
+      <section className="bg-background">
         <div className="container mx-auto px-4 py-10 md:py-14">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-2 text-gray-600 max-w-2xl">{subtitle}</p>
+            <p className="mt-2 text-muted-foreground max-w-2xl">{subtitle}</p>
           )}
           {children && <div className="mt-6">{children}</div>}
         </div>

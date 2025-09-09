@@ -36,7 +36,7 @@ export default function SettingsPage() {
                 className={`px-3 py-1.5 rounded-md border text-sm ${
                   language === "en"
                     ? "bg-red-700 text-white border-red-700"
-                    : "bg-white hover:bg-gray-50"
+                    : "bg-card text-foreground border-border hover:bg-muted"
                 }`}
                 onClick={() => setLanguage("en")}
               >
@@ -47,7 +47,7 @@ export default function SettingsPage() {
                 className={`px-3 py-1.5 rounded-md border text-sm ${
                   language === "vi"
                     ? "bg-red-700 text-white border-red-700"
-                    : "bg-white hover:bg-gray-50"
+                    : "bg-card text-foreground border-border hover:bg-muted"
                 }`}
                 onClick={() => setLanguage("vi")}
               >
@@ -68,7 +68,7 @@ export default function SettingsPage() {
                 className={`px-3 py-1.5 rounded-md border text-sm ${
                   currency === "USD"
                     ? "bg-red-700 text-white border-red-700"
-                    : "bg-white hover:bg-gray-50"
+                    : "bg-card text-foreground border-border hover:bg-muted"
                 }`}
                 onClick={() => setCurrency("USD")}
               >
@@ -79,7 +79,7 @@ export default function SettingsPage() {
                 className={`px-3 py-1.5 rounded-md border text-sm ${
                   currency === "VND"
                     ? "bg-red-700 text-white border-red-700"
-                    : "bg-white hover:bg-gray-50"
+                    : "bg-card text-foreground border-border hover:bg-muted"
                 }`}
                 onClick={() => setCurrency("VND")}
               >

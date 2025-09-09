@@ -25,7 +25,9 @@ export default function Section({
   actions,
 }: SectionProps) {
   return (
-    <section className={cn("py-8 md:py-10", className)}>
+    <section
+      className={cn("py-8 md:py-10 bg-background text-foreground", className)}
+    >
       <div className={cn("container mx-auto px-4", containerClassName)}>
         {(title || subtitle || actions) && (
           <div
@@ -43,8 +45,9 @@ export default function Section({
             {title && (
               <div
                 className={cn(
-                  "h-1 w-52 rounded-full mt-2 bg-[currentColor]",
-                  center && "mx-auto"
+                  "h-1 w-52 rounded-full mt-2",
+                  center && "mx-auto",
+                  "bg-[currentColor]"
                 )}
               />
             )}
