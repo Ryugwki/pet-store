@@ -50,7 +50,11 @@ export default function MalesPage() {
   }, []);
 
   const data = useMemo(() => {
-    return items.filter((p) => p.category === "Kings" || p.gender === "male");
+    return items.filter(
+      (p) =>
+        (p.category === "Kings" || p.gender === "male") &&
+        p.category !== "Kittens"
+    );
   }, [items]);
 
   // Group pets by cattery name (single column of groups)

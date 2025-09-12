@@ -576,7 +576,10 @@ export default function AdminPetsPage() {
         open={!!confirmDeleteId}
         onOpenChange={(open) => !open && setConfirmDeleteId(null)}
       >
-        <AlertDialogContent hideOverlay>
+        <AlertDialogContent
+          hideOverlay
+          className="bg-card text-foreground border border-border"
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this pet?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -605,11 +608,14 @@ export default function AdminPetsPage() {
           setOpen(v);
         }}
       >
-        <DialogContent className="sm:max-w-lg bg-white" hideOverlay>
+        <DialogContent
+          className="sm:max-w-2xl md:max-w-3xl lg:max-w-4xl bg-card text-foreground border border-border shadow-xl max-h-[90dvh] overflow-y-auto"
+          hideOverlay
+        >
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Pet" : "Add Pet"}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-2">
+          <div className="grid gap-4 py-2 md:grid-cols-2">
             <div className="grid gap-1">
               <Label htmlFor="petImages">Pet Images</Label>
               <input
@@ -620,7 +626,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("pet")}
                 aria-label="Pet images"
                 title="Select pet images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
               />
               {(existingPetImages.length > 0 || newPetImages.length > 0) && (
                 <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -685,7 +691,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("pedigree")}
                 aria-label="Pedigree images"
                 title="Select pedigree images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
               />
               {(existingPedigreeImages.length > 0 ||
                 newPedigreeImages.length > 0) && (
@@ -751,7 +757,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("awards")}
                 aria-label="Awards images"
                 title="Select awards images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
               />
               {(existingAwardsImages.length > 0 ||
                 newAwardsImages.length > 0) && (
@@ -817,7 +823,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("certificate")}
                 aria-label="Certificate images"
                 title="Select certificate images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
               />
               {(existingCertificateImages.length > 0 ||
                 newCertificateImages.length > 0) && (
@@ -882,7 +888,7 @@ export default function AdminPetsPage() {
                 }
               />
             </div>
-            <div className="grid gap-1 grid-cols-1 sm:grid-cols-2 gap-x-4">
+            <div className="grid gap-1 grid-cols-1 sm:grid-cols-2 gap-x-4 md:col-span-2">
               <div className="grid gap-1">
                 <Label htmlFor="breed">Breed</Label>
                 <Input
@@ -927,20 +933,26 @@ export default function AdminPetsPage() {
             </div>
 
             {form.category === "Kittens" && (
-              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:col-span-2 [&_*]:min-w-0">
                 <div className="grid gap-1">
                   <Label>Father</Label>
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="min-w-[10rem]">
-                          {form.fatherId
-                            ? fatherOptions.find((p) => p._id === form.fatherId)
-                                ?.name || form.fatherId
-                            : "Choose father"}
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between overflow-hidden"
+                        >
+                          <span className="truncate">
+                            {form.fatherId
+                              ? fatherOptions.find(
+                                  (p) => p._id === form.fatherId
+                                )?.name || form.fatherId
+                              : "Choose father"}
+                          </span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-white max-h-80 overflow-auto w-64">
+                      <DropdownMenuContent className="bg-card text-foreground border border-border max-h-80 overflow-auto w-64">
                         <DropdownMenuLabel>Select a father</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {fatherOptions.map((p) => (
@@ -970,14 +982,20 @@ export default function AdminPetsPage() {
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="min-w-[10rem]">
-                          {form.motherId
-                            ? motherOptions.find((p) => p._id === form.motherId)
-                                ?.name || form.motherId
-                            : "Choose mother"}
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between overflow-hidden"
+                        >
+                          <span className="truncate">
+                            {form.motherId
+                              ? motherOptions.find(
+                                  (p) => p._id === form.motherId
+                                )?.name || form.motherId
+                              : "Choose mother"}
+                          </span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-white max-h-80 overflow-auto w-64">
+                      <DropdownMenuContent className="bg-card text-foreground border border-border max-h-80 overflow-auto w-64">
                         <DropdownMenuLabel>Select a mother</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {motherOptions.map((p) => (
@@ -1087,7 +1105,7 @@ export default function AdminPetsPage() {
                 }
               />
             </div>
-            <div className="grid gap-1">
+            <div className="grid gap-1 md:col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"

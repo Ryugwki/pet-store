@@ -50,7 +50,9 @@ export default function FemalesPage() {
 
   const data = useMemo(() => {
     return items.filter(
-      (p) => p.category === "Queens" || p.gender === "female"
+      (p) =>
+        (p.category === "Queens" || p.gender === "female") &&
+        p.category !== "Kittens"
     );
   }, [items]);
 
