@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type React from "react";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "../styles/globals.css";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -9,7 +9,18 @@ import { Toaster } from "@/components/ui/sonner";
 import ThemeProvider from "@/components/layout/theme-provider";
 import I18nProvider from "@/components/layout/i18n-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "LilyDrogon",
@@ -28,7 +39,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body
+        className={`${inter.variable} ${fraunces.variable} ${inter.className}`}
+        suppressHydrationWarning={true}
+      >
         <ThemeProvider>
           <I18nProvider>
             <div className="flex min-h-screen flex-col">

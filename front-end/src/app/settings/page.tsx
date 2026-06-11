@@ -27,16 +27,16 @@ export default function SettingsPage() {
   return (
     <Section title="Settings">
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-        <Card className="p-4 md:p-5 space-y-4">
+        <Card className="rounded-none border border-border bg-card p-5 md:p-6 space-y-5 shadow-none">
           <div className="grid gap-2">
             <Label>Language</Label>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className={`px-3 py-1.5 rounded-md border text-sm ${
+                className={`px-4 py-2 rounded-none border text-xs uppercase tracking-[0.14em] transition-colors ${
                   language === "en"
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-card text-foreground border-border hover:bg-muted"
+                    ? "bg-[#26221c] text-[#faf7f2] border-[#26221c] dark:bg-[#faf7f2] dark:text-[#26221c] dark:border-[#faf7f2]"
+                    : "bg-card text-foreground border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 }`}
                 onClick={() => setLanguage("en")}
               >
@@ -44,10 +44,10 @@ export default function SettingsPage() {
               </button>
               <button
                 type="button"
-                className={`px-3 py-1.5 rounded-md border text-sm ${
+                className={`px-4 py-2 rounded-none border text-xs uppercase tracking-[0.14em] transition-colors ${
                   language === "vi"
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-card text-foreground border-border hover:bg-muted"
+                    ? "bg-[#26221c] text-[#faf7f2] border-[#26221c] dark:bg-[#faf7f2] dark:text-[#26221c] dark:border-[#faf7f2]"
+                    : "bg-card text-foreground border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 }`}
                 onClick={() => setLanguage("vi")}
               >
@@ -65,10 +65,10 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className={`px-3 py-1.5 rounded-md border text-sm ${
+                className={`px-4 py-2 rounded-none border text-xs uppercase tracking-[0.14em] transition-colors ${
                   currency === "USD"
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-card text-foreground border-border hover:bg-muted"
+                    ? "bg-[#26221c] text-[#faf7f2] border-[#26221c] dark:bg-[#faf7f2] dark:text-[#26221c] dark:border-[#faf7f2]"
+                    : "bg-card text-foreground border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 }`}
                 onClick={() => setCurrency("USD")}
               >
@@ -76,10 +76,10 @@ export default function SettingsPage() {
               </button>
               <button
                 type="button"
-                className={`px-3 py-1.5 rounded-md border text-sm ${
+                className={`px-4 py-2 rounded-none border text-xs uppercase tracking-[0.14em] transition-colors ${
                   currency === "VND"
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-card text-foreground border-border hover:bg-muted"
+                    ? "bg-[#26221c] text-[#faf7f2] border-[#26221c] dark:bg-[#faf7f2] dark:text-[#26221c] dark:border-[#faf7f2]"
+                    : "bg-card text-foreground border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 }`}
                 onClick={() => setCurrency("VND")}
               >
@@ -107,9 +107,9 @@ export default function SettingsPage() {
               Toggle between light and dark themes.
             </p>
           </div>
-          <div className="pt-2 border-t">
-            <div className="text-sm text-muted-foreground">Preview</div>
-            <div className="mt-1 text-sm">Price example: {format(3000)}</div>
+          <div className="pt-3 border-t border-border">
+            <div className="eyebrow">Preview</div>
+            <div className="mt-2 text-sm">Price example: {format(3000)}</div>
             <div className="mt-1 text-sm">
               Language sample: {language === "vi" ? "Xin chào" : "Hello"}
             </div>

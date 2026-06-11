@@ -41,13 +41,15 @@ export default function AboutPage() {
 
   return (
     <Section title={title} containerClassName="max-w-4xl">
-      <p className="text-lg text-muted-foreground mb-6 whitespace-pre-line">
+      <p className="eyebrow mb-3">Our Story</p>
+      <p className="font-serif text-xl md:text-2xl leading-relaxed text-foreground mb-3 whitespace-pre-line">
         {content}
       </p>
+      <div className="h-px w-14 bg-[var(--color-bronze)] mb-8" aria-hidden="true" />
       <div
         className={`grid grid-cols-1 ${
           images.length > 1 ? "sm:grid-cols-2" : ""
-        } gap-4`}
+        } gap-6`}
       >
         {images.map((src, i) => {
           const wrapperClass =
@@ -56,8 +58,8 @@ export default function AboutPage() {
               : "relative w-full aspect-[16/9] sm:aspect-[4/3]";
           const imgClass =
             images.length > 1
-              ? "rounded-xl object-cover shadow-lg"
-              : "rounded-xl object-contain bg-gray-50 shadow-lg";
+              ? "object-cover ring-1 ring-border"
+              : "object-contain bg-muted ring-1 ring-border";
           return (
             <div key={i} className={wrapperClass}>
               <Image

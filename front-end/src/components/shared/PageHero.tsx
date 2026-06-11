@@ -17,17 +17,21 @@ export default function PageHero({
   children,
 }: PageHeroProps) {
   if (!imageSrc) {
-    // Fallback when no image: simple contained header
+    // Fallback when no image: centered editorial header
     return (
-      <section className="bg-background">
-        <div className="container mx-auto px-4 py-10 md:py-14">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+      <section className="bg-background border-b border-border">
+        <div className="container mx-auto px-4 py-16 md:py-24 text-center">
+          <span className="eyebrow block mb-5">LilyDrogon</span>
+          <h1 className="font-serif text-4xl md:text-5xl font-light text-foreground tracking-tight">
             {title}
           </h1>
+          <div className="mx-auto mt-6 h-px w-14 rule-bronze" aria-hidden="true" />
           {subtitle && (
-            <p className="mt-2 text-muted-foreground max-w-2xl">{subtitle}</p>
+            <p className="mt-6 text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {subtitle}
+            </p>
           )}
-          {children && <div className="mt-6">{children}</div>}
+          {children && <div className="mt-8">{children}</div>}
         </div>
       </section>
     );
@@ -44,18 +48,28 @@ export default function PageHero({
           className="object-cover object-center"
           priority
         />
-        {/* Readability overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-transparent" />
+        {/* Readability scrim */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(22,19,15,.82) 0%, rgba(22,19,15,.55) 34%, rgba(22,19,15,.18) 64%, rgba(22,19,15,.34) 100%)",
+          }}
+          aria-hidden="true"
+        />
 
         {/* Text overlay */}
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white drop-shadow">
+              <span className="block mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-bronze-soft)]">
+                LilyDrogon
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-[#faf7f2] tracking-tight drop-shadow">
                 {title}
               </h1>
               {subtitle && (
-                <p className="mt-2 md:mt-4 text-white/90 text-sm md:text-lg">
+                <p className="mt-3 md:mt-5 text-[#faf7f2]/90 text-sm md:text-lg leading-relaxed max-w-xl">
                   {subtitle}
                 </p>
               )}

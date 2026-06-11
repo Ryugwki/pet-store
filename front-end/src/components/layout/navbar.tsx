@@ -113,53 +113,50 @@ export default function Header() {
       <div className="relative px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center">
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
-          <Link href="/" className="flex items-center space-x-2">
-            <PawPrint className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block text-xl">
+          <Link href="/" className="flex items-center space-x-2 group">
+            <PawPrint className="h-6 w-6 text-[var(--color-bronze)]" />
+            <span className="hidden font-serif font-semibold tracking-tight sm:inline-block text-xl text-foreground">
               {siteName}
             </span>
           </Link>
         </div>
 
         {/* Menu center */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 items-center space-x-6">
-          <Link
-            href="/"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
-          >
-            Home
-          </Link>
-
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 items-center space-x-8">
           <Link
             href="/kings"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
+            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
           >
             Kings
+            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
           <Link
             href="/queens"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
+            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
           >
             Queens
+            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
           <Link
             href="/kittens"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
+            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
           >
             Kittens
+            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
           <Link
             href="/about"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
+            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
           >
             About
+            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-
           <Link
             href="/contact"
-            className="text-medium font-medium transition-colors hover:text-[#b91c1c]"
+            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
           >
             Contact
+            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
         </nav>
 
@@ -219,7 +216,7 @@ export default function Header() {
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-red-700 text-white hover:bg-red-500 border-none"
+                    className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] border-none transition-colors dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
                   >
                     Sign Up
                   </Button>
@@ -303,10 +300,10 @@ export default function Header() {
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-destructive/10 transition-colors duration-200 cursor-pointer text-red-600"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer text-foreground"
                   >
-                    <LogOut size={16} />
-                    <span className="text-sm font-medium text-red-600">
+                    <LogOut size={16} className="text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">
                       Logout
                     </span>
                   </DropdownMenuItem>
@@ -374,43 +371,36 @@ export default function Header() {
         <div className="fixed inset-x-0 top-16 bottom-0 z-[100] bg-background md:hidden overflow-y-auto">
           <nav className="container grid gap-3 p-6">
             <Link
-              href="/"
-              className="flex items-center gap-2 text-lg font-semibold"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
               href="/kittens"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
               onClick={() => setIsMenuOpen(false)}
             >
               Kittens
             </Link>
             <Link
               href="/kings"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
               onClick={() => setIsMenuOpen(false)}
             >
               Kings
             </Link>
             <Link
               href="/queens"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
               onClick={() => setIsMenuOpen(false)}
             >
               Queens
             </Link>
             <Link
               href="/about"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact Us
@@ -420,14 +410,14 @@ export default function Header() {
               <>
                 <Link
                   href="/sign-in"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign Up
@@ -437,14 +427,14 @@ export default function Header() {
               <>
                 <Link
                   href="/profile"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Settings
@@ -452,14 +442,14 @@ export default function Header() {
                 {user?.role === "admin" && (
                   <Link
                     href="/admin/dashboard"
-                    className="flex items-center gap-2 text-lg font-semibold"
+                    className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Admin
                   </Link>
                 )}
                 <button
-                  className="text-left text-red-600 font-semibold"
+                  className="text-left font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                   onClick={() => {
                     handleLogoutClick();
                     setIsMenuOpen(false);

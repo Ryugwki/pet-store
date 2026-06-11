@@ -17,7 +17,7 @@ export default function AdminLayout({
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <AdminNavbar />
-        <div className="flex-1 p-6 lg:p-8">{children}</div>
+        <div className="flex-1 p-6 lg:p-10 max-w-[1280px] w-full mx-auto">{children}</div>
       </div>
     </div>
   );

@@ -320,48 +320,54 @@ export default function AdminSettingsPage() {
         onClose={() => setBanner(null)}
         durationMs={5000}
       />
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Settings</h1>
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <p className="eyebrow mb-1">CMS</p>
+          <h1 className="text-2xl font-serif font-semibold">Site content</h1>
+          <span className="rule-bronze mt-3 block h-px w-44" />
+        </div>
         <Button
           onClick={save}
           disabled={saving}
-          className="bg-red-700 hover:bg-red-600 text-white"
+          className="bg-[#26221c] text-[#faf7f2] hover:bg-[#3a342b] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[#e6ddcd]"
         >
           {saving ? "Saving..." : "Save"}
         </Button>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-200 gap-1">
+        <TabsList className="grid w-full grid-cols-4 bg-muted border border-border gap-1 p-1">
           <TabsTrigger
             value="general"
-            className="rounded-md text-gray-700 hover:bg-gray-100 transition-all hover:shadow-sm data-[state=active]:!bg-red-700 data-[state=active]:!text-white data-[state=active]:shadow-lg"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
           >
             General
           </TabsTrigger>
           <TabsTrigger
             value="hero"
-            className="rounded-lg text-gray-700 hover:bg-gray-100 transition-all hover:shadow-sm data-[state=active]:!bg-red-700 data-[state=active]:!text-white data-[state=active]:shadow-lg"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
           >
             Hero
           </TabsTrigger>
           <TabsTrigger
             value="about"
-            className="rounded-lg text-gray-700 hover:bg-gray-100 transition-all hover:shadow-sm data-[state=active]:!bg-red-700 data-[state=active]:!text-white data-[state=active]:shadow-lg"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
           >
             About
           </TabsTrigger>
           <TabsTrigger
             value="contact"
-            className="rounded-lg text-gray-700 hover:bg-gray-100 transition-all hover:shadow-sm data-[state=active]:!bg-red-700 data-[state=active]:!text-white data-[state=active]:shadow-lg"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
           >
             Contact
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
-          <Card className="p-4 space-y-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardTitle className="flex items-center gap-2">General</CardTitle>
+          <Card className="p-5 space-y-4 border-border shadow-sm transition-all duration-300">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-semibold">
+              General
+            </CardTitle>
             <div className="grid gap-3">
               <div className="grid gap-1">
                 <Label htmlFor="siteName">Site Name</Label>
@@ -375,12 +381,12 @@ export default function AdminSettingsPage() {
             </div>
           </Card>
 
-          <Card className="p-4 space-y-3 mt-4">
+          <Card className="p-5 space-y-3 mt-4 border-border shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Featured Pets</h2>
+              <h2 className="text-lg font-serif font-semibold">Featured Pets</h2>
               <Button
                 variant="outline"
-                className="text-sm"
+                className="text-sm border-border hover:border-[var(--color-bronze)] hover:text-[var(--color-bronze-deep)]"
                 onClick={async () => {
                   try {
                     const res = await petsAPI.getAll({ limit: 50 });
@@ -433,14 +439,14 @@ export default function AdminSettingsPage() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="secondary"
-                    className="bg-white text-gray-700 hover:bg-gray-100 border"
+                    className="bg-card text-foreground hover:bg-muted border border-border"
                   >
                     {selectedPetId
                       ? petLabels[selectedPetId] || selectedPetId
                       : "Choose pet"}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="max-h-80 w-72 overflow-y-auto bg-white">
+                <DropdownMenuContent className="max-h-80 w-72 overflow-y-auto bg-popover border-border">
                   <DropdownMenuLabel>
                     {optionsLoading ? "Loading..." : "Select a pet"}
                   </DropdownMenuLabel>
@@ -489,7 +495,7 @@ export default function AdminSettingsPage() {
                   });
                 }}
                 disabled={!selectedPetId}
-                className="bg-red-700 text-white hover:bg-red-600"
+                className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
               >
                 Add selected
               </Button>
@@ -498,7 +504,7 @@ export default function AdminSettingsPage() {
                 <select
                   id="featuredPos"
                   aria-label="Featured section position"
-                  className="border rounded-md px-2 py-1 text-sm"
+                  className="border border-border rounded-md bg-background px-2 py-1 text-sm"
                   value={featuredPos}
                   onChange={(e) =>
                     setSettings((s) => ({
@@ -517,11 +523,11 @@ export default function AdminSettingsPage() {
                 </select>
               </div>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               The featured position is reserved in the global order; section
               “Position” numbers skip this slot.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Pick and order pets shown on home and other sections. The order
               below is used by the API.
             </p>
@@ -532,10 +538,13 @@ export default function AdminSettingsPage() {
                 {(settings.featuredPetIds || []).map((id, idx) => (
                   <li
                     key={id}
-                    className="flex items-center justify-between gap-2 border rounded p-2"
+                    className="flex items-center justify-between gap-2 border border-border bg-background rounded-md p-2"
                   >
                     <div className="text-sm">
-                      #{idx + 1} — {petLabels[id] || id}
+                      <span className="font-serif text-[var(--color-bronze-deep)]">
+                        #{idx + 1}
+                      </span>{" "}
+                      — {petLabels[id] || id}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -569,12 +578,12 @@ export default function AdminSettingsPage() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="text-white bg-red-700 hover:bg-red-600"
+                            className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
                           >
                             Remove
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
+                        <AlertDialogContent className="bg-card border-border">
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               Remove this pet from featured?
@@ -587,7 +596,7 @@ export default function AdminSettingsPage() {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              className="text-white bg-red-700 hover:bg-red-600"
+                              className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
                               onClick={() => {
                                 setFeatured(
                                   (settings.featuredPetIds || []).filter(
@@ -612,11 +621,13 @@ export default function AdminSettingsPage() {
             )}
           </Card>
 
-          <Card className="p-4 space-y-4 mt-4">
+          <Card className="p-5 space-y-4 mt-4 border-border shadow-sm">
             <CardTitle className="flex items-center justify-between">
-              <span>Homepage Sections</span>
+              <span className="font-serif text-lg font-semibold">
+                Homepage Sections
+              </span>
               <Button
-                className="bg-red-700 text-white hover:bg-red-600"
+                className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
                 onClick={() =>
                   setSettings((s) => ({
                     ...(s || {}),
@@ -639,7 +650,7 @@ export default function AdminSettingsPage() {
             </CardTitle>
             <div className="grid gap-3">
               {(settings.sections || []).length === 0 && (
-                <p className="text-sm text-gray-500">No sections yet.</p>
+                <p className="text-sm text-muted-foreground">No sections yet.</p>
               )}
               {(settings.sections || [])
                 .slice()
@@ -647,7 +658,7 @@ export default function AdminSettingsPage() {
                 .map((sec, idx) => (
                   <div
                     key={(sec as any)._id || idx}
-                    className="rounded-md border p-3 space-y-3"
+                    className="rounded-md border border-border bg-background p-3 space-y-3"
                     draggable
                     onDragStart={(e) => {
                       e.dataTransfer.setData("text/plain", String(idx));
@@ -684,7 +695,7 @@ export default function AdminSettingsPage() {
                         <Label>Collapse</Label>
                         <button
                           type="button"
-                          className="border rounded-md px-2 py-1 text-sm bg-white hover:bg-gray-100"
+                          className="border border-border rounded-md px-2 py-1 text-sm bg-card hover:bg-muted hover:border-[var(--color-bronze)]"
                           onClick={() =>
                             setCollapsed((c) => ({ ...c, [idx]: !c[idx] }))
                           }
@@ -703,7 +714,7 @@ export default function AdminSettingsPage() {
                             <select
                               id={`pos-${idx}`}
                               aria-label="Global section position"
-                              className="border rounded-md px-2 py-1 text-sm"
+                              className="border border-border rounded-md bg-background px-2 py-1 text-sm"
                               value={globalVal}
                               onChange={(e) => {
                                 const newGlobal = Number(e.target.value);
@@ -741,7 +752,7 @@ export default function AdminSettingsPage() {
                         <Label className="invisible">Action</Label>
                         <Button
                           variant="destructive"
-                          className="text-white bg-red-700 hover:bg-red-600"
+                          className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
                           onClick={() =>
                             setSettings((s) => {
                               const list = (s?.sections || []).filter(
@@ -759,7 +770,7 @@ export default function AdminSettingsPage() {
                     {!collapsed[idx] && (
                       <div className="grid gap-2">
                         <Label>Content</Label>
-                        <div className="rounded-md border overflow-hidden">
+                        <div className="rounded-md border border-border overflow-hidden">
                           <RichTextEditor
                             key={(sec as any)._id || idx}
                             value={sec.contentHtml || ""}
@@ -842,14 +853,14 @@ export default function AdminSettingsPage() {
         </TabsContent>
 
         <TabsContent value="hero">
-          <Card className="p-4 space-y-3">
+          <Card className="p-5 space-y-3 border-border shadow-sm">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">Hero</h2>
+              <h2 className="text-lg font-serif font-semibold">Hero</h2>
               <div className="flex items-center gap-2">
                 <Label htmlFor="heroPage">Page</Label>
                 <select
                   id="heroPage"
-                  className="border rounded-md px-2 py-1 text-sm"
+                  className="border border-border rounded-md bg-background px-2 py-1 text-sm"
                   value={selectedPage}
                   aria-label="Select hero page"
                   onChange={(e) => setSelectedPage(e.target.value as PageKey)}
@@ -901,7 +912,7 @@ export default function AdminSettingsPage() {
                   accept="image/*"
                   aria-label="Hero images"
                   title="Upload one or more hero images"
-                  className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                  className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-[var(--color-bronze-deep)] hover:file:bg-[var(--color-bronze-soft)]/40"
                   onChange={(e) => {
                     const files = e.currentTarget.files;
                     if (files && files.length) addMultipleHeroImages(files);
@@ -922,7 +933,7 @@ export default function AdminSettingsPage() {
                     {imgs.map((src, idx) => (
                       <div
                         key={`${src}-${idx}`}
-                        className="relative h-28 border rounded overflow-hidden"
+                        className="relative h-28 border border-border rounded-md overflow-hidden"
                       >
                         <Image
                           src={src}
@@ -975,8 +986,8 @@ export default function AdminSettingsPage() {
         </TabsContent>
 
         <TabsContent value="about">
-          <Card className="p-4 space-y-3">
-            <h2 className="text-lg font-semibold">About</h2>
+          <Card className="p-5 space-y-3 border-border shadow-sm">
+            <h2 className="text-lg font-serif font-semibold">About</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1">
                 <Label htmlFor="aboutTitle">Title</Label>
@@ -1005,7 +1016,7 @@ export default function AdminSettingsPage() {
                 multiple
                 aria-label="About images"
                 title="Upload about images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-[var(--color-bronze-deep)] hover:file:bg-[var(--color-bronze-soft)]/40"
                 onChange={(e) => {
                   if (e.target.files && e.target.files.length)
                     addAboutImages(e.target.files);
@@ -1016,7 +1027,7 @@ export default function AdminSettingsPage() {
                   {settings.about.images.map((url, idx) => (
                     <div
                       key={idx}
-                      className="relative h-24 border rounded overflow-hidden"
+                      className="relative h-24 border border-border rounded-md overflow-hidden"
                     >
                       <Image
                         src={url}
@@ -1042,8 +1053,8 @@ export default function AdminSettingsPage() {
         </TabsContent>
 
         <TabsContent value="contact">
-          <Card className="p-4 space-y-3">
-            <h2 className="text-lg font-semibold">Contact</h2>
+          <Card className="p-5 space-y-3 border-border shadow-sm">
+            <h2 className="text-lg font-serif font-semibold">Contact</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1">
                 <Label htmlFor="contactEmail">Email</Label>
@@ -1086,7 +1097,7 @@ export default function AdminSettingsPage() {
                   value={settings.contact?.mapEmbed || ""}
                   onChange={(e) => setContact({ mapEmbed: e.target.value })}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   If left blank and Address is provided, a simple Google Map
                   embed will be generated on save.
                 </p>

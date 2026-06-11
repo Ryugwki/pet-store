@@ -1,11 +1,6 @@
 "use client";
 import { Fragment, useEffect, useRef, useState } from "react";
 import PageHero from "@/components/shared/PageHero";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import Section from "@/components/shared/Section";
 import PetCard from "@/components/shared/PetCard";
 import EmptyState from "@/components/shared/EmptyState";
@@ -87,25 +82,11 @@ export default function HomePage() {
   return (
     <>
       {Array.isArray(hero.images) && hero.images.length > 1 ? (
-        <section className="relative bg-gray-200">
-          <div className="container mx-auto px-0">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {hero.images.map((src, i) => (
-                  <CarouselItem key={src || i}>
-                    <PageHero
-                      title={hero.title || "Welcome to our Cattery"}
-                      subtitle={
-                        hero.subtitle || "Healthy, socialized cats and kittens."
-                      }
-                      imageSrc={src || "/images/placeholder.svg"}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </div>
-        </section>
+        <HeroSlider
+          title={hero.title || "Welcome to our Cattery"}
+          subtitle={hero.subtitle || "Healthy, socialized cats and kittens."}
+          images={hero.images}
+        />
       ) : (
         <PageHero
           title={hero.title || "Welcome to our Cattery"}
@@ -208,11 +189,11 @@ export default function HomePage() {
                 {sec.title && (
                   <>
                     <h2
-                      className={`font-extrabold text-center ${themeClass}-title`}
+                      className={`font-serif text-center ${themeClass}-title`}
                     >
                       {sec.title}
                     </h2>
-                    <div className="h-1 w-52 rounded-full mx-auto mb-6 bg-[currentColor]" />
+                    <div className="h-px w-40 mx-auto mt-3 mb-6 bg-[currentColor]" />
                   </>
                 )}
                 <HtmlContent
@@ -231,39 +212,40 @@ export default function HomePage() {
 
       {/* Cat registries section */}
       <Section>
-        <div className="rounded-md border border-border px-6 py-7 md:px-8 md:py-9">
-          <h2 className="text-center font-extrabold text-red-700 text-3xl">
-            Cat registries We Work With
+        <div className="rounded-md border border-border bg-card px-6 py-10 md:px-8 md:py-12">
+          <p className="eyebrow text-center">Registered &amp; Recognized</p>
+          <h2 className="mt-3 text-center font-serif text-3xl md:text-4xl">
+            Cat Registries We Work With
           </h2>
-          <div className="h-1 w-52 rounded-full mx-auto mt-2 mb-6 bg-red-700" />
-          <p className="text-muted-foreground text-xl text-center md:text-center">
-            We register our cat & kittens with reputable associations.
+          <div className="rule-bronze h-px w-16 mx-auto mt-4 mb-6" />
+          <p className="text-muted-foreground text-lg md:text-xl text-center">
+            We register our cats &amp; kittens with reputable associations.
           </p>
-          <div className="mt-6 space-y-5">
-            <div className="flex items-center justify-center gap-4">
+          <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-14">
+            <div className="flex items-center gap-4">
               <Image
                 src="/images/logo/World_Cat_Federation_logo.png"
-                alt="WCF logo"
+                alt="World Cat Federation logo"
                 width={48}
                 height={48}
                 className="shrink-0"
                 unoptimized
               />
-              <span className="text-xl text-foreground">
+              <span className="font-serif text-xl text-foreground">
                 World Cat Federation
               </span>
             </div>
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center gap-4">
               <Image
                 src="/images/logo/Cat_Fanciers'_Association_new_logo.png"
-                alt="CFA logo"
+                alt="Cat Fanciers Association logo"
                 width={48}
                 height={48}
                 className="shrink-0"
                 unoptimized
               />
-              <span className="text-xl text-foreground">
-                Cat Fanciers Federation
+              <span className="font-serif text-xl text-foreground">
+                Cat Fanciers Association
               </span>
             </div>
           </div>
@@ -287,7 +269,7 @@ function FeaturedBlock({
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="h-[320px] bg-gray-100 rounded-xl animate-pulse"
+              className="h-[320px] bg-muted rounded-xl animate-pulse"
             />
           ))}
         </div>
@@ -295,10 +277,11 @@ function FeaturedBlock({
         <EmptyState description="No featured pets available right now." />
       ) : (
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-center font-extrabold text-red-700 text-3xl">
-            Our kings and queens
+          <p className="eyebrow text-center">Our Cattery</p>
+          <h2 className="mt-3 text-center font-serif text-3xl md:text-4xl">
+            Our Kings and Queens
           </h2>
-          <div className="h-1 w-52 rounded-full mx-auto mt-2 mb-6 bg-red-700" />
+          <div className="rule-bronze h-px w-16 mx-auto mt-4 mb-8" />
           <div className="grid justify-center grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-6">
             {pets.map((pet) => {
               const mapped: Pet = {
@@ -350,6 +333,136 @@ function FeaturedBlock({
         </div>
       )}
     </Section>
+  );
+}
+
+// Full-bleed Heritage hero slider: serif headline + bronze eyebrow + subtitle
+// over a left gradient scrim, with prev/next arrows, dot controls and autoplay.
+function HeroSlider({
+  title,
+  subtitle,
+  images,
+}: {
+  title: string;
+  subtitle: string;
+  images: string[];
+}) {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = images.length;
+
+  // Autoplay with pause on hover/focus
+  useEffect(() => {
+    if (paused || count < 2) return;
+    const id = setInterval(() => {
+      setCurrent((c) => (c + 1) % count);
+    }, 5500);
+    return () => clearInterval(id);
+  }, [paused, count]);
+
+  const go = (i: number) => setCurrent(((i % count) + count) % count);
+
+  return (
+    <section
+      className="relative overflow-hidden bg-[#16130f]"
+      aria-roledescription="carousel"
+      aria-label="Cattery introduction"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      <div className="relative h-[clamp(440px,70vh,720px)] w-full">
+        {/* stacked cross-fade slides */}
+        {images.map((src, i) => (
+          <div
+            key={src || i}
+            className={`absolute inset-0 transition-opacity duration-[1100ms] ease-out ${
+              i === current ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={i === current ? undefined : true}
+          >
+            <Image
+              src={src || "/images/placeholder.svg"}
+              alt={`${title} — photo ${i + 1} of ${count}`}
+              fill
+              sizes="100vw"
+              priority={i === 0}
+              className="object-cover object-center"
+            />
+          </div>
+        ))}
+
+        {/* left gradient scrim for legibility (reveals the photo on the right) */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(22,19,15,0.82) 0%, rgba(22,19,15,0.45) 38%, rgba(22,19,15,0.12) 70%, rgba(22,19,15,0.30) 100%)",
+          }}
+          aria-hidden="true"
+        />
+
+        {/* overlaid copy */}
+        <div className="pointer-events-none absolute inset-0 flex items-center">
+          <div className="container mx-auto px-6 md:px-8">
+            <div className="max-w-2xl">
+              <span className="eyebrow block text-[var(--color-bronze-soft)]">
+                WCF &amp; CFA Registered · Maine Coon
+              </span>
+              <h1 className="mt-5 font-serif text-3xl font-light leading-tight text-[#faf7f2] drop-shadow-[0_2px_30px_rgba(0,0,0,0.45)] sm:text-4xl md:text-5xl lg:text-6xl">
+                {title}
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-[rgba(250,247,242,0.92)] drop-shadow md:text-lg">
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {count > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Previous photo"
+              onClick={() => go(current - 1)}
+              className="absolute left-4 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(250,247,242,0.5)] bg-[rgba(22,19,15,0.25)] font-serif text-2xl leading-none text-[#faf7f2] backdrop-blur-sm transition hover:bg-[#faf7f2] hover:text-[#26221c] md:left-7"
+            >
+              <span aria-hidden="true">&#8249;</span>
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              onClick={() => go(current + 1)}
+              className="absolute right-4 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(250,247,242,0.5)] bg-[rgba(22,19,15,0.25)] font-serif text-2xl leading-none text-[#faf7f2] backdrop-blur-sm transition hover:bg-[#faf7f2] hover:text-[#26221c] md:right-7"
+            >
+              <span aria-hidden="true">&#8250;</span>
+            </button>
+            <div
+              className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 gap-3"
+              role="tablist"
+              aria-label="Choose slide"
+            >
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={current === i}
+                  aria-label={`Show photo ${i + 1}`}
+                  onClick={() => go(i)}
+                  className={`h-[9px] rounded-full border transition-all ${
+                    current === i
+                      ? "w-7 border-[var(--color-bronze-soft)] bg-[var(--color-bronze-soft)]"
+                      : "w-[9px] border-[rgba(250,247,242,0.85)] bg-transparent"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 

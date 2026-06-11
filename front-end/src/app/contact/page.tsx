@@ -85,7 +85,8 @@ export default function ContactPage() {
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* left column: details and actions */}
         <div className="space-y-6">
-          <Card className="p-4 md:p-5 space-y-3 md:space-y-4 bg-gradient-to-br from-red-50/40 to-transparent">
+          <Card className="p-5 md:p-6 space-y-4 md:space-y-5 bg-card border-border">
+            <p className="eyebrow">Get in Touch</p>
             {loading ? (
               <div className="space-y-3">
                 <Skeleton className="h-5 w-40" />
@@ -93,11 +94,11 @@ export default function ContactPage() {
                 <Skeleton className="h-4 w-3/4" />
               </div>
             ) : contact.content ? (
-              <p className="text-muted-foreground whitespace-pre-line text-base md:text-xl font-semibold md:font-bold">
+              <p className="text-foreground whitespace-pre-line font-serif text-lg md:text-xl leading-relaxed">
                 {contact.content}
               </p>
             ) : (
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground font-serif text-lg">
                 We&apos;d love to hear from you.
               </p>
             )}
@@ -107,14 +108,14 @@ export default function ContactPage() {
               {loading ? (
                 <Skeleton className="h-10 w-full" />
               ) : contact.email ? (
-                <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 rounded-md bg-red-50 text-red-700 grid place-items-center border border-red-100">
+                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
                       <Mail className="h-4 w-4" />
                     </span>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="break-words sm:truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
                     >
                       {contact.email}
                     </a>
@@ -122,7 +123,7 @@ export default function ContactPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="hover:text-red-700"
+                    className="hover:text-[var(--color-bronze-deep)]"
                     onClick={() => handleCopy("email", contact.email)}
                     aria-label="Copy email"
                   >
@@ -139,14 +140,14 @@ export default function ContactPage() {
               {loading ? (
                 <Skeleton className="h-10 w-full" />
               ) : contact.phone ? (
-                <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 rounded-md bg-red-50 text-red-700 grid place-items-center border border-red-100">
+                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
                       <Phone className="h-4 w-4" />
                     </span>
                     <a
                       href={`tel:${contact.phone}`}
-                      className="break-words sm:truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
                     >
                       {contact.phone}
                     </a>
@@ -154,7 +155,7 @@ export default function ContactPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="hover:text-red-700"
+                    className="hover:text-[var(--color-bronze-deep)]"
                     onClick={() => handleCopy("phone", contact.phone)}
                     aria-label="Copy phone"
                   >
@@ -171,9 +172,9 @@ export default function ContactPage() {
               {loading ? (
                 <Skeleton className="h-10 w-full" />
               ) : contact.address ? (
-                <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="h-8 w-8 rounded-md bg-red-50 text-red-700 grid place-items-center border border-red-100">
+                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
                       <MapPin className="h-4 w-4" />
                     </span>
                     <p
@@ -188,7 +189,7 @@ export default function ContactPage() {
                       <Button
                         asChild
                         size="sm"
-                        className="bg-red-700 text-white hover:bg-red-600"
+                        className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze)]"
                       >
                         <a href={mapsHref} target="_blank" rel="noreferrer">
                           <span className="hidden sm:inline">
@@ -201,7 +202,7 @@ export default function ContactPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="hover:text-red-700"
+                      className="hover:text-[var(--color-bronze-deep)]"
                       onClick={() => handleCopy("address", contact.address)}
                       aria-label="Copy address"
                     >
@@ -219,14 +220,14 @@ export default function ContactPage() {
               {loading ? (
                 <Skeleton className="h-10 w-full" />
               ) : contact.imessage ? (
-                <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 rounded-md bg-red-50 text-red-700 grid place-items-center border border-red-100">
+                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
                       <MessageSquare className="h-4 w-4" />
                     </span>
                     <a
                       href={`imessage:${encodeURIComponent(contact.imessage)}`}
-                      className="break-words sm:truncate hover:text-red-700"
+                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
                       title={contact.imessage}
                     >
                       iMessage: {contact.imessage}
@@ -235,7 +236,7 @@ export default function ContactPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="hover:text-red-700"
+                    className="hover:text-[var(--color-bronze-deep)]"
                     onClick={() => handleCopy("imessage", contact.imessage)}
                     aria-label="Copy iMessage"
                   >
@@ -250,25 +251,25 @@ export default function ContactPage() {
             </div>
 
             {error && !loading && (
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-[var(--color-bronze-deep)]">{error}</p>
             )}
           </Card>
         </div>
 
         {/* right column: map */}
         <div>
-          <Card className="p-2 md:p-3 ring-1 ring-red-100 bg-gradient-to-b from-red-50/30 to-transparent">
+          <Card className="p-2 md:p-3 bg-card border-border">
             {loading ? (
               <Skeleton className="aspect-video w-full rounded" />
             ) : mapEmbedHtml ? (
-              <div className="aspect-video w-full rounded-md overflow-hidden border border-red-200 shadow-sm bg-white">
+              <div className="aspect-video w-full overflow-hidden border border-border bg-card">
                 <div
                   className="h-full w-full"
                   dangerouslySetInnerHTML={{ __html: mapEmbedHtml }}
                 />
               </div>
             ) : (
-              <div className="aspect-video w-full rounded-md border grid place-items-center text-muted-foreground">
+              <div className="aspect-video w-full border border-border grid place-items-center text-muted-foreground">
                 Map not available
               </div>
             )}

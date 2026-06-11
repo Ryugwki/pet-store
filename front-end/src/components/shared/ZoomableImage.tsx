@@ -75,7 +75,7 @@ export default function ZoomableImage({
                 href={src}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center h-8 w-8 bg-black/60 text-white hover:bg-black/70"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-none bg-[#16130f]/80 text-[#faf7f2] transition-colors hover:bg-[var(--color-bronze-deep)]"
                 aria-label="Open original in new tab"
                 title="Open original"
               >
@@ -84,7 +84,7 @@ export default function ZoomableImage({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center justify-center h-8 w-8 bg-black/60 text-white hover:bg-black/70"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-none bg-[#16130f]/80 text-[#faf7f2] transition-colors hover:bg-[var(--color-bronze-deep)]"
                 aria-label="Close preview"
                 title="Close"
               >

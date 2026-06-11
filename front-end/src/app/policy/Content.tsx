@@ -12,35 +12,48 @@ export default function Content() {
   return (
     <>
       <Section title="Policy" center>
-        <ul className="list-disc list-outside pl-5 space-y-2 text-base leading-relaxed">
-          <li>Registered kittens with vet check-up and sales agreement.</li>
-          <li>
+        <ul className="mx-auto max-w-2xl space-y-3 text-base leading-relaxed text-foreground">
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            Registered kittens with vet check-up and sales agreement.
+          </li>
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
             Parents/ancestors health tested for HCM/PKD (ultrasound), HD
             (X-ray), and DNA.
           </li>
-          <li>Kittens tested for FeLV/FIV and parasites.</li>
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            Kittens tested for FeLV/FIV and parasites.
+          </li>
         </ul>
       </Section>
 
       <Section title="Reservation Process" center>
-        <ul className="list-disc list-outside pl-5 space-y-2 text-base leading-relaxed">
-          <li>
-            <span className="font-semibold">Deposit:</span> A $500
-            non-refundable deposit is required to secure your spot on the
+        <ul className="mx-auto max-w-2xl space-y-4 text-base leading-relaxed text-foreground">
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            <span className="font-serif text-lg text-[var(--color-bronze-deep)]">
+              Deposit:
+            </span>{" "}
+            A $500 non-refundable deposit is required to secure your spot on the
             waiting list.
           </li>
-          <li>
-            <span className="font-semibold">Second Deposit:</span> An additional
-            $500 deposit is due 4 weeks after the kittens are born.
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            <span className="font-serif text-lg text-[var(--color-bronze-deep)]">
+              Second Deposit:
+            </span>{" "}
+            An additional $500 deposit is due 4 weeks after the kittens are born.
           </li>
-          <li>
-            <span className="font-semibold">Deposit Guarantee:</span> Your
-            deposit guarantees a quality kitten from our 2024 litters, with your
-            preferred gender, coat type, and color (subject to availability).
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            <span className="font-serif text-lg text-[var(--color-bronze-deep)]">
+              Deposit Guarantee:
+            </span>{" "}
+            Your deposit guarantees a quality kitten from our 2024 litters, with
+            your preferred gender, coat type, and color (subject to
+            availability).
           </li>
-          <li>
-            <span className="font-semibold">Price:</span> {format(amount)} for
-            all colors.
+          <li className="relative pl-6 before:absolute before:left-0 before:top-0 before:text-[var(--color-bronze)] before:content-['—']">
+            <span className="font-serif text-lg text-[var(--color-bronze-deep)]">
+              Price:
+            </span>{" "}
+            {format(amount)} for all colors.
           </li>
         </ul>
       </Section>

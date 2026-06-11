@@ -53,23 +53,25 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center bg-white px-4 py-12">
-      <Card className="w-full max-w-md border-0">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-2">
-            <PawPrint className="h-10 w-10 text-red-700" />
+    <div className="min-h-[70vh] flex items-center justify-center bg-background px-4 py-16">
+      <Card className="w-full max-w-md border border-border bg-card shadow-none rounded-none">
+        <CardHeader className="space-y-3 text-center pt-10">
+          <div className="flex justify-center mb-1">
+            <PawPrint className="h-9 w-9 text-[var(--color-bronze)]" />
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <p className="eyebrow">Join the Cattery</p>
+          <CardTitle className="font-serif text-3xl font-normal">
             Create an account
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <div className="mx-auto h-px w-12 bg-[var(--color-bronze)]" />
+          <CardDescription className="text-muted-foreground">
             Enter your information to create an account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-8">
             {error && (
-              <p className="text-sm text-red-600" role="alert">
+              <p className="text-sm text-[var(--color-bronze-deep)]" role="alert">
                 {error}
               </p>
             )}
@@ -81,6 +83,7 @@ export default function SignUpPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className="rounded-none border-border"
               />
             </div>
             <div className="space-y-2">
@@ -92,6 +95,7 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="rounded-none border-border"
               />
             </div>
             <div className="space-y-2">
@@ -102,6 +106,7 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="rounded-none border-border"
               />
               <p className="text-xs text-muted-foreground">
                 Password must be at least 8 characters long and include a number
@@ -116,43 +121,53 @@ export default function SignUpPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                className="rounded-none border-border"
               />
             </div>
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 id="terms"
-                className="rounded border-gray-300"
+                className="rounded-none border-border accent-[var(--color-bronze)]"
                 required
                 title="Agree to terms and privacy policy"
               />
               <Label htmlFor="terms" className="text-sm font-normal">
                 I agree to the{" "}
-                <Link href="/terms" className="text-red-700 hover:underline">
+                <Link
+                  href="/terms"
+                  className="text-[var(--color-bronze-deep)] hover:text-foreground"
+                >
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-red-700 hover:underline">
+                <Link
+                  href="/privacy"
+                  className="text-[var(--color-bronze-deep)] hover:text-foreground"
+                >
                   Privacy Policy
                 </Link>
               </Label>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col">
+          <CardFooter className="flex flex-col px-8 pb-10">
             <Button
-              className="w-full text-white bg-red-700 mt-4"
+              className="w-full rounded-none bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] uppercase tracking-[0.18em] text-xs mt-4 dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
               type="submit"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </Button>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-5 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/sign-in" className="text-red-700 hover:underline">
+              <Link
+                href="/sign-in"
+                className="text-[var(--color-bronze-deep)] hover:text-foreground"
+              >
                 Sign in
               </Link>
             </div>
-           
+
             <div className="mt-6 flex items-center justify-center">
               <Lock className="h-4 w-4 text-muted-foreground mr-1" />
               <span className="text-xs text-muted-foreground">
