@@ -67,10 +67,17 @@ export default function AdminPetsPage() {
     category: "" as "" | "Kings" | "Queens" | "Kittens",
     dob: "",
     color: "",
+    size: "medium",
+    weight: "",
     litter: "",
     pedigreeURL: "",
     cattery: "",
+    coi: "",
+    registry: "",
     description: "",
+    vaccinated: false,
+    dewormed: false,
+    healthCertificate: false,
     fatherId: "",
     motherId: "",
   });
@@ -195,10 +202,17 @@ export default function AdminPetsPage() {
       category: "",
       dob: "",
       color: "",
+      size: "medium",
+      weight: "",
       litter: "",
       pedigreeURL: "",
       cattery: "",
+      coi: "",
+      registry: "",
       description: "",
+      vaccinated: false,
+      dewormed: false,
+      healthCertificate: false,
       fatherId: "",
       motherId: "",
     });
@@ -267,10 +281,20 @@ export default function AdminPetsPage() {
         (src.category as "Kings" | "Queens" | "Kittens" | undefined) || "",
       dob: toDateInput(src.dob),
       color: src.characteristics?.color ?? "",
+      size: src.characteristics?.size ?? "medium",
+      weight:
+        src.characteristics?.weight != null
+          ? String(src.characteristics.weight)
+          : "",
       litter: (src.litter ?? []).join(", "),
       pedigreeURL: src.pedigreeURL || "",
       cattery: src.cattery || "",
+      coi: src.coi != null ? String(src.coi) : "",
+      registry: src.registry || "",
       description: src.description ?? "",
+      vaccinated: src.health?.vaccinated ?? false,
+      dewormed: src.health?.dewormed ?? false,
+      healthCertificate: src.health?.healthCertificate ?? false,
       fatherId: (src as BackendPet).fatherId || "",
       motherId: (src as BackendPet).motherId || "",
     });
@@ -327,16 +351,35 @@ export default function AdminPetsPage() {
     kind: "pet" | "pedigree" | "awards" | "certificate",
     index: number
   ) => {
-    if (kind === "pet")
-      setExistingPetImages((prev) => prev.filter((_, i) => i !== index));
-    if (kind === "pedigree")
-      setExistingPedigreeImages((prev) => prev.filter((_, i) => i !== index));
-    if (kind === "awards")
-      setExistingAwardsImages((prev) => prev.filter((_, i) => i !== index));
-    if (kind === "certificate")
-      setExistingCertificateImages((prev) =>
-        prev.filter((_, i) => i !== index)
-      );
+    const groups: Record<
+      typeof kind,
+      { list: string[]; setter: React.Dispatch<React.SetStateAction<string[]>> }
+    > = {
+      pet: { list: existingPetImages, setter: setExistingPetImages },
+      pedigree: {
+        list: existingPedigreeImages,
+        setter: setExistingPedigreeImages,
+      },
+      awards: { list: existingAwardsImages, setter: setExistingAwardsImages },
+      certificate: {
+        list: existingCertificateImages,
+        setter: setExistingCertificateImages,
+      },
+    };
+    const { list, setter } = groups[kind];
+    const removedUrl = list[index];
+    setter((prev) => prev.filter((_, i) => i !== index));
+    // Delete the orphaned file from the server (Cloudinary proxy).
+    // Best-effort: surface failures in the banner but keep the UI removal.
+    if (removedUrl) {
+      uploadsAPI.deleteImage(removedUrl).catch((err) => {
+        setBanner({
+          variant: "destructive",
+          title: "Failed to delete image from server",
+          message: handleAPIError(err),
+        });
+      });
+    }
   };
 
   const removeNew = (
@@ -355,6 +398,8 @@ export default function AdminPetsPage() {
 
   const handleSubmit = async () => {
     const ageComputed = computeAgeYears(form.dob);
+    const weightParsed = form.weight.trim() === "" ? undefined : Number(form.weight);
+    const coiParsed = form.coi.trim() === "" ? undefined : Number(form.coi);
     const payload = {
       name: form.name.trim(),
       breed: form.breed.trim(),
@@ -368,12 +413,28 @@ export default function AdminPetsPage() {
       dob: form.dob ? new Date(form.dob).toISOString() : undefined,
       pedigreeURL: form.pedigreeURL.trim() || undefined,
       cattery: form.cattery.trim() || undefined,
+      coi:
+        coiParsed !== undefined && !Number.isNaN(coiParsed)
+          ? coiParsed
+          : undefined,
+      registry: form.registry.trim() || undefined,
       description: form.description.trim(),
       litter: form.litter
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean),
-      characteristics: { color: form.color.trim() },
+      health: {
+        vaccinated: form.vaccinated,
+        dewormed: form.dewormed,
+        healthCertificate: form.healthCertificate,
+      },
+      characteristics: {
+        color: form.color.trim(),
+        size: form.size,
+        ...(weightParsed !== undefined && !Number.isNaN(weightParsed)
+          ? { weight: weightParsed }
+          : {}),
+      },
       ...(form.category === "Kittens" && form.fatherId
         ? { fatherId: form.fatherId }
         : {}),
@@ -1135,6 +1196,68 @@ export default function AdminPetsPage() {
               />
             </div>
             <div className="grid gap-1">
+              <Label htmlFor="size" className="eyebrow">
+                Size
+              </Label>
+              <select
+                id="size"
+                aria-label="Size"
+                className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                value={form.size}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, size: e.target.value }))
+                }
+              >
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="weight" className="eyebrow">
+                Weight (kg)
+              </Label>
+              <Input
+                id="weight"
+                type="number"
+                step="0.1"
+                min="0"
+                value={form.weight}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, weight: e.target.value }))
+                }
+              />
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="coi" className="eyebrow">
+                COI (%)
+              </Label>
+              <Input
+                id="coi"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={form.coi}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, coi: e.target.value }))
+                }
+              />
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="registry" className="eyebrow">
+                Registry
+              </Label>
+              <Input
+                id="registry"
+                placeholder="e.g., WCF, CFA"
+                value={form.registry}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, registry: e.target.value }))
+                }
+              />
+            </div>
+            <div className="grid gap-1">
               <Label htmlFor="litter" className="eyebrow">
                 Litter
               </Label>
@@ -1162,6 +1285,59 @@ export default function AdminPetsPage() {
                   setForm((f) => ({ ...f, pedigreeURL: e.target.value }))
                 }
               />
+            </div>
+            <div className="grid gap-2 md:col-span-2">
+              <Label className="eyebrow">Health</Label>
+              <div className="flex flex-wrap gap-x-6 gap-y-3">
+                <label
+                  htmlFor="vaccinated"
+                  className="flex items-center gap-2 text-sm text-foreground"
+                >
+                  <input
+                    id="vaccinated"
+                    type="checkbox"
+                    className="h-4 w-4 accent-[var(--color-bronze)]"
+                    checked={form.vaccinated}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, vaccinated: e.target.checked }))
+                    }
+                  />
+                  Vaccinated
+                </label>
+                <label
+                  htmlFor="dewormed"
+                  className="flex items-center gap-2 text-sm text-foreground"
+                >
+                  <input
+                    id="dewormed"
+                    type="checkbox"
+                    className="h-4 w-4 accent-[var(--color-bronze)]"
+                    checked={form.dewormed}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, dewormed: e.target.checked }))
+                    }
+                  />
+                  Dewormed
+                </label>
+                <label
+                  htmlFor="healthCertificate"
+                  className="flex items-center gap-2 text-sm text-foreground"
+                >
+                  <input
+                    id="healthCertificate"
+                    type="checkbox"
+                    className="h-4 w-4 accent-[var(--color-bronze)]"
+                    checked={form.healthCertificate}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        healthCertificate: e.target.checked,
+                      }))
+                    }
+                  />
+                  Health certificate
+                </label>
+              </div>
             </div>
             <div className="grid gap-1 md:col-span-2">
               <Label htmlFor="description" className="eyebrow">

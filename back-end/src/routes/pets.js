@@ -4,6 +4,32 @@ import Settings from "../models/Settings.js";
 
 const router = express.Router();
 
+// Normalize incoming category casing/slug to the canonical enum.
+// Accepts "kings"/"Kings"/"KINGS"/slug variants; returns the canonical
+// value (e.g. "Kings") or null when it doesn't map to a known category.
+function normalizeCategory(input) {
+  if (input == null) return null;
+  const key = String(input).trim().toLowerCase();
+  if (!key) return null;
+  const map = {
+    kings: "Kings",
+    king: "Kings",
+    queens: "Queens",
+    queen: "Queens",
+    kittens: "Kittens",
+    kitten: "Kittens",
+  };
+  return map[key] || null;
+}
+
+// Normalize gender to the stored lowercase enum (male/female), or null.
+function normalizeGender(input) {
+  if (input == null) return null;
+  const key = String(input).trim().toLowerCase();
+  if (key === "male" || key === "female") return key;
+  return null;
+}
+
 // GET /api/pets
 router.get("/", async (req, res) => {
   try {
@@ -25,8 +51,16 @@ router.get("/", async (req, res) => {
         $regex: String(color),
         $options: "i",
       };
-    if (gender) filter.gender = gender;
-    if (category) filter.category = category;
+    if (gender) {
+      // Accept male/female case-insensitively; fall back to raw value
+      // so an unknown gender yields an (empty) deterministic result.
+      filter.gender = normalizeGender(gender) ?? gender;
+    }
+    if (category) {
+      // Accept "kings"/"Kings"/"KINGS"/slug; fall back to raw value
+      // so unknown categories still query deterministically (empty result).
+      filter.category = normalizeCategory(category) ?? category;
+    }
 
     const skip = (Number(page) - 1) * Number(limit);
     const sort = {
@@ -70,7 +104,12 @@ router.get("/featured", async (_req, res) => {
 router.get("/category/:category", async (req, res) => {
   try {
     const { category } = req.params;
-    const items = await Pet.find({ category }).sort({ createdAt: -1 });
+    // Normalize casing/slug to the canonical enum before querying;
+    // fall back to the raw param so unknown values stay deterministic.
+    const normalized = normalizeCategory(category) ?? category;
+    const items = await Pet.find({ category: normalized }).sort({
+      createdAt: -1,
+    });
     res.json(items);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch category" });
@@ -82,7 +121,26 @@ router.get("/:id", async (req, res) => {
   try {
     const pet = await Pet.findById(req.params.id);
     if (!pet) return res.status(404).json({ message: "Pet not found" });
-    res.json(pet);
+
+    // Plain object so we can attach populated parents WITHOUT losing the
+    // raw fatherId/motherId fields the front-end still reads.
+    const out = pet.toObject();
+
+    // Additively resolve parent refs. Keep fatherId/motherId intact; omit a
+    // parent object entirely when its id is missing or unresolvable.
+    const parentSelect = "_id name category petImages";
+    const [father, mother] = await Promise.all([
+      pet.fatherId
+        ? Pet.findById(pet.fatherId).select(parentSelect).lean()
+        : null,
+      pet.motherId
+        ? Pet.findById(pet.motherId).select(parentSelect).lean()
+        : null,
+    ]);
+    if (father) out.father = father;
+    if (mother) out.mother = mother;
+
+    res.json(out);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch pet" });
   }

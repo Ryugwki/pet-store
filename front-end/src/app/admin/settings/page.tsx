@@ -788,40 +788,6 @@ export default function AdminSettingsPage() {
                         </div>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="grid gap-1">
-                            <Label>Background</Label>
-                            <Input
-                              type="color"
-                              value={sec.bgColor || "#ffffff"}
-                              onChange={(e) =>
-                                setSettings((s) => ({
-                                  ...(s || {}),
-                                  sections: (s?.sections || []).map((x, i) =>
-                                    i === idx
-                                      ? { ...x, bgColor: e.target.value }
-                                      : x
-                                  ),
-                                }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-1">
-                            <Label>Text color</Label>
-                            <Input
-                              type="color"
-                              value={sec.textColor || "#111827"}
-                              onChange={(e) =>
-                                setSettings((s) => ({
-                                  ...(s || {}),
-                                  sections: (s?.sections || []).map((x, i) =>
-                                    i === idx
-                                      ? { ...x, textColor: e.target.value }
-                                      : x
-                                  ),
-                                }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-1">
                             <Label>Font size (px)</Label>
                             <Input
                               type="number"
@@ -844,6 +810,9 @@ export default function AdminSettingsPage() {
                             />
                           </div>
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          Section colours follow the site theme.
+                        </p>
                       </div>
                     )}
                   </div>

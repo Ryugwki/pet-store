@@ -2,14 +2,60 @@
 
 import { Card } from "@/components/ui/card";
 import { PawPrint } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { adminAPI, handleAPIError } from "@/lib/axios";
+import { adminAPI, petsAPI, handleAPIError } from "@/lib/axios";
 
-type Stats = { total: number; males: number; females: number; kittens: number };
+// Additive: backend /admin/stats now also returns category-based counts
+// (kings/queens/uncategorized) plus a featured count. Every field is optional
+// so a missing key never breaks the cards.
+type Stats = {
+  total?: number;
+  males?: number;
+  females?: number;
+  kittens?: number;
+  kings?: number;
+  queens?: number;
+  uncategorized?: number;
+  featured?: number;
+};
+
+// Minimal shape of a pet row as returned by GET /pets ({ items, total, ... }).
+type RecentPet = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  category?: string;
+  petImages?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+// Newest-first timestamp for a pet, preferring createdAt and falling back to
+// updatedAt. Returns 0 when neither is present so undated rows sink to the end.
+function recencyTime(p: RecentPet): number {
+  const raw = p.createdAt ?? p.updatedAt;
+  const t = raw ? new Date(raw).getTime() : NaN;
+  return Number.isNaN(t) ? 0 : t;
+}
+
+function formatAddedDate(p: RecentPet): string {
+  const raw = p.createdAt ?? p.updatedAt;
+  if (!raw) return "Date unknown";
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return "Date unknown";
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [recent, setRecent] = useState<RecentPet[] | null>(null);
+  const [recentError, setRecentError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -19,7 +65,31 @@ export default function AdminDashboardPage() {
         if (!mounted) return;
         setStats(res.data as Stats);
       })
-      .catch((err) => setError(handleAPIError(err)));
+      .catch((err) => {
+        if (!mounted) return;
+        setError(handleAPIError(err));
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Real "Recently added cats": pull the pets list, sort by createdAt (fallback
+  // updatedAt) descending, keep the newest 5. No fabricated data.
+  useEffect(() => {
+    let mounted = true;
+    petsAPI
+      .getAll({ limit: 50, sortBy: "createdAt", sortOrder: "desc" })
+      .then((res) => {
+        if (!mounted) return;
+        const list = (res.data?.items ?? res.data ?? []) as RecentPet[];
+        const sorted = [...list].sort((a, b) => recencyTime(b) - recencyTime(a));
+        setRecent(sorted.slice(0, 5));
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setRecentError(handleAPIError(err));
+      });
     return () => {
       mounted = false;
     };
@@ -27,8 +97,8 @@ export default function AdminDashboardPage() {
 
   const kpis = [
     { label: "Total cats", value: stats?.total, sub: "in the registry", accent: true },
-    { label: "Males", value: stats?.males, sub: "kings on the roster" },
-    { label: "Females", value: stats?.females, sub: "queens on the roster" },
+    { label: "Kings", value: stats?.kings, sub: "males on the roster" },
+    { label: "Queens", value: stats?.queens, sub: "females on the roster" },
     { label: "Kittens", value: stats?.kittens, sub: "on the kittens page" },
   ];
 
@@ -122,28 +192,86 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
             </li>
+            <li className="flex items-center gap-4 px-6 py-4">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-sm text-[var(--color-bronze-deep)]">
+                ★
+              </span>
+              <div>
+                <p className="text-sm font-medium">
+                  {stats?.featured ?? "--"} featured
+                  {stats?.uncategorized != null
+                    ? ` · ${stats.uncategorized} uncategorized`
+                    : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Admin-selected highlights and cats still missing a category.
+                </p>
+              </div>
+            </li>
           </ul>
         </Card>
 
         <Card className="rounded-lg border-border bg-card p-0 shadow-none">
           <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-            <h2 className="font-serif text-lg">Recent Activity</h2>
-            <span className="ml-auto eyebrow">Latest</span>
+            <h2 className="font-serif text-lg">Recently added cats</h2>
+            <span className="ml-auto eyebrow">Newest first</span>
           </div>
-          <ul className="divide-y divide-border">
-            <li className="flex items-center gap-3 px-6 py-4 text-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bronze)]" aria-hidden="true" />
-              New pet added: “Snowy” (Kitten)
-            </li>
-            <li className="flex items-center gap-3 px-6 py-4 text-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bronze)]" aria-hidden="true" />
-              User “minh” updated profile
-            </li>
-            <li className="flex items-center gap-3 px-6 py-4 text-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bronze)]" aria-hidden="true" />
-              Order #1024 marked as shipped
-            </li>
-          </ul>
+
+          {recentError ? (
+            <p className="px-6 py-4 text-sm text-muted-foreground">
+              {recentError}
+            </p>
+          ) : recent === null ? (
+            <p className="px-6 py-4 text-sm text-muted-foreground">Loading…</p>
+          ) : recent.length === 0 ? (
+            <p className="px-6 py-4 text-sm text-muted-foreground">
+              No cats in the registry yet.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {recent.map((p, i) => {
+                const thumb = p.petImages?.[0];
+                const name = p.name || "Untitled cat";
+                return (
+                  <li
+                    key={p._id ?? p.id ?? `${name}-${i}`}
+                    className="flex items-center gap-4 px-6 py-4"
+                  >
+                    <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+                      {thumb ? (
+                        <Image
+                          src={thumb}
+                          alt={name}
+                          fill
+                          sizes="44px"
+                          unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-[var(--color-bronze-deep)]">
+                          <PawPrint className="h-4 w-4" />
+                        </span>
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">
+                        {name}
+                        {p.category ? (
+                          <span className="text-muted-foreground">
+                            {" "}
+                            · {p.category}
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Added {formatAddedDate(p)}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </Card>
       </section>
     </div>

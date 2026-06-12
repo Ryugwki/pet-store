@@ -15,6 +15,10 @@ const petSchema = new mongoose.Schema(
     },
     gender: { type: String, enum: ["male", "female"], required: true },
     pedigreeURL: { type: String, default: "" },
+    // Coefficient of inbreeding (percent) and registry body (e.g. "WCF", "CFA").
+    // Both optional; left undefined when not provided.
+    coi: { type: Number },
+    registry: { type: String },
     description: { type: String, default: "" },
     petImages: [{ type: String }],
     pedigreeImages: [{ type: String }],

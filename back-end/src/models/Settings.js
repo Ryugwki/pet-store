@@ -36,7 +36,7 @@ const settingsSchema = new mongoose.Schema(
       ),
     ],
     // Position of the Featured block among homepage sections (1..sections.length+1)
-    featuredPosition: { type: Number, default: 0 },
+    featuredPosition: { type: Number, default: 1 },
     hero: {
       home: {
         title: { type: String, default: "Welcome to our Cattery" },

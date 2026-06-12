@@ -18,6 +18,8 @@ function genderLabel(g: string): string {
 
 export default function KittensPage() {
   const [items, setItems] = useState<BackendPet[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
   const [hero, setHero] = useState<{
     title?: string;
     subtitle?: string;
@@ -26,32 +28,63 @@ export default function KittensPage() {
   // working filters (mockup #view-cats filter-bar)
   const [gender, setGender] = useState<string>("");
   const [cattery, setCattery] = useState<string>("");
+  // bump to force a re-fetch (used by the error-state Retry button)
+  const [reloadKey, setReloadKey] = useState<number>(0);
 
+  // hero settings — fetched once (independent of the gender filter)
   useEffect(() => {
     let mounted = true;
-    Promise.all([
-      petsAPI.getAll({ limit: 100 }),
-      settingsAPI.get().catch(() => null),
-    ]).then(([petsRes, settingsRes]) => {
-      if (!mounted) return;
-      setItems((petsRes.data.items ?? petsRes.data) as BackendPet[]);
-      const h =
-        (settingsRes?.data?.hero?.kittens as {
-          title?: string;
-          subtitle?: string;
-          images?: string[];
-        }) || null;
-      if (h) setHero(h);
-    });
+    settingsAPI
+      .get()
+      .then((settingsRes) => {
+        if (!mounted) return;
+        const h =
+          (settingsRes?.data?.hero?.kittens as {
+            title?: string;
+            subtitle?: string;
+            images?: string[];
+          }) || null;
+        if (h) setHero(h);
+      })
+      .catch(() => {
+        /* hero is decorative — fall back to the editorial header */
+      });
     return () => {
       mounted = false;
     };
   }, []);
 
-  // base set for this page (Kittens)
-  const base = useMemo(() => {
-    return items.filter((p) => p.category === "Kittens");
-  }, [items]);
+  // pets — SERVER-SIDE filtered to this category (and gender when set),
+  // so the page only loads its own listing instead of the whole catalogue.
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError(false);
+    petsAPI
+      .getAll({
+        category: "Kittens",
+        limit: 200,
+        ...(gender ? { gender } : {}),
+      })
+      .then((petsRes) => {
+        if (!mounted) return;
+        setItems((petsRes.data.items ?? petsRes.data) as BackendPet[]);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setError(true);
+        setItems([]);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [gender, reloadKey]);
+
+  // base set for this page (server already scoped it to Kittens + gender)
+  const base = items;
 
   // cattery options derived from the base set
   const catteryOptions = useMemo(() => {
@@ -60,14 +93,13 @@ export default function KittensPage() {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [base]);
 
-  // apply the working filters on top of the base set
+  // apply the client-side cattery filter on top of the server-scoped set
   const data = useMemo(() => {
     return base.filter((p) => {
-      if (gender && p.gender !== gender) return false;
       if (cattery && (p.cattery || "Other").trim() !== cattery) return false;
       return true;
     });
-  }, [base, gender, cattery]);
+  }, [base, cattery]);
 
   // group pets by cattery name
   const groups = useMemo(() => {
@@ -83,6 +115,8 @@ export default function KittensPage() {
   const intro =
     hero.subtitle || "Healthy, socialized kittens ready for loving homes.";
 
+  const heroImage = hero.images?.[0];
+
   function clearFilters() {
     setGender("");
     setCattery("");
@@ -90,7 +124,12 @@ export default function KittensPage() {
 
   return (
     <section className="listing">
-      <div className="listing-hero">
+      <div
+        className={`listing-hero${heroImage ? " listing-hero--image" : ""}`}
+        style={
+          heroImage ? { backgroundImage: `url(${heroImage})` } : undefined
+        }
+      >
         <span className="label">The Nursery</span>
         <h1>{hero.title || "Available Kittens"}</h1>
         <p>{intro}</p>
@@ -138,7 +177,34 @@ export default function KittensPage() {
       </div>
 
       <div>
-        {data.length === 0 ? (
+        {loading ? (
+          <div className="listing-skeleton">
+            <div className="listing-grid">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="skeleton-card" aria-hidden="true">
+                  <div className="skeleton-photo" />
+                  <div className="skeleton-line" />
+                  <div className="skeleton-line short" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : error ? (
+          <div className="listing-error" role="alert">
+            <h2>We couldn&rsquo;t load the nursery</h2>
+            <p>
+              Something went wrong reaching our cattery records. Please try
+              again in a moment.
+            </p>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => setReloadKey((k) => k + 1)}
+            >
+              Retry
+            </button>
+          </div>
+        ) : data.length === 0 ? (
           <div className="no-match">
             <h2>No kittens match those filters</h2>
             <p>Try widening your selection — or view the whole nursery.</p>

@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import PetCard from "@/components/shared/PetCard";
 import { settingsAPI, petsAPI } from "@/lib/axios";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import type { Pet } from "@/types";
 
 type HomeSection = {
@@ -25,6 +26,7 @@ type ContactSettings = {
   email?: string;
   phone?: string;
   address?: string;
+  imessage?: string;
 };
 
 type BackendPet = Omit<Pet, "id"> & {
@@ -57,8 +59,15 @@ export default function HomePage() {
         const arr = (res.data?.sections as HomeSection[]) || [];
         setSections([...arr].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
         const count = arr.length;
-        const pos = Number(res.data?.featuredPosition) || count + 1;
-        setFeaturedPos(Math.min(Math.max(1, pos), count + 1));
+        // C5: featuredPosition is a 1-based slot in [1 .. count+1]. Treat 0 and
+        // non-numeric as "unset" and default to 1 (don't let `|| count+1` swallow
+        // a legitimate 0); clamp any out-of-range value back into the valid range.
+        const rawPos = Number(res.data?.featuredPosition);
+        const pos =
+          Number.isFinite(rawPos) && rawPos >= 1 && rawPos <= count + 1
+            ? rawPos
+            : 1;
+        setFeaturedPos(pos);
         const h =
           (res.data?.hero?.home as {
             title?: string;
@@ -247,7 +256,7 @@ export default function HomePage() {
                   )}
                   <HtmlContent
                     className="prose max-w-none [&_*]:!text-inherit [&_*]:!leading-relaxed prose-ul:list-disc prose-ol:list-decimal prose-li:my-1"
-                    html={sec.contentHtml || ""}
+                    html={sanitizeHtml(sec.contentHtml || "")}
                   />
                 </div>
               </div>
@@ -360,13 +369,38 @@ export default function HomePage() {
                 Call us
               </a>
             )}
-            {!contact.email && !contact.phone && (
+            {contact.imessage && (
+              <a
+                className="btn btn-ivory"
+                href={`imessage:${encodeURIComponent(contact.imessage)}`}
+              >
+                iMessage us
+              </a>
+            )}
+            {!contact.email && !contact.phone && !contact.imessage && (
               <Link className="btn btn-ivory-solid" href="/contact">
                 Browse cats
               </Link>
             )}
           </div>
+          {contact.address && (
+            <p className="cta-address">
+              <span aria-hidden="true">Visit&nbsp;·&nbsp;</span>
+              {contact.address}
+              <span> · by appointment</span>
+            </p>
+          )}
         </div>
+        <style jsx>{`
+          .cta-address {
+            margin: 28px auto 0;
+            max-width: 34em;
+            color: var(--bronze-soft);
+            font-size: 13.5px;
+            line-height: 1.7;
+            letter-spacing: 0.01em;
+          }
+        `}</style>
       </section>
     </>
   );
