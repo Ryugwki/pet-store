@@ -5,6 +5,13 @@ import PetCard from "@/components/shared/PetCard";
 import { settingsAPI, petsAPI } from "@/lib/axios";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import type { Pet } from "@/types";
+import {
+  DEFAULT_HOME_MARKETING,
+  DEFAULT_TRUST,
+  withCount,
+  type HomeMarketing,
+  type TrustContent,
+} from "@/constants/siteDefaults";
 
 type HomeSection = {
   _id?: string;
@@ -46,6 +53,8 @@ export default function HomePage() {
   const [sections, setSections] = useState<HomeSection[]>([]);
   const [about, setAbout] = useState<AboutSettings>({});
   const [contact, setContact] = useState<ContactSettings>({});
+  const [home, setHome] = useState<Partial<HomeMarketing>>({});
+  const [trust, setTrust] = useState<TrustContent | null>(null);
   const [pets, setPets] = useState<BackendPet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
   const [featuredPos, setFeaturedPos] = useState<number>(0);
@@ -78,6 +87,8 @@ export default function HomePage() {
         setHero(h || {});
         setAbout((res.data?.about as AboutSettings) || {});
         setContact((res.data?.contact as ContactSettings) || {});
+        setHome((res.data?.home as Partial<HomeMarketing>) || {});
+        setTrust((res.data?.trust as TrustContent) || null);
       })
       .catch(() => setSections([]));
     return () => {
@@ -112,6 +123,12 @@ export default function HomePage() {
     ? `tel:${String(contact.phone).replace(/[^+\d]/g, "")}`
     : "";
 
+  // Marketing copy: settings-driven with fallback to the current hardcoded
+  // defaults so the site looks identical until the owner edits.
+  const heroEyebrow = home.eyebrow || DEFAULT_HOME_MARKETING.eyebrow;
+  const heroStats = home.stats?.length ? home.stats : DEFAULT_HOME_MARKETING.stats;
+  const trustContent = trust ?? DEFAULT_TRUST;
+
   return (
     <>
       {/* (1) full-bleed hero slider over the real hero.images */}
@@ -119,36 +136,34 @@ export default function HomePage() {
         title={hero.title || "Welcome to our Cattery"}
         subtitle={hero.subtitle || "Healthy, socialized cats and kittens."}
         images={(hero.images || []).filter(Boolean)}
+        eyebrow={heroEyebrow}
       />
 
       {/* (2) hero-stats band */}
       <section className="hero-stats-band">
         <div className="wrap">
           <div className="hero-stats">
-            <div className="hero-stat">
-              <b>100%</b>
-              <span>
-                Health-tested lines
-                <br />
-                HCM · SMA · PKD
-              </span>
-            </div>
-            <div className="hero-stat">
-              <b>{loadingPets ? "—" : String(pets.length)}</b>
-              <span>
-                Cats in our
-                <br />
-                current catalogue
-              </span>
-            </div>
-            <div className="hero-stat">
-              <b>3–5 yrs</b>
-              <span>
-                The slow maturing of a
-                <br />
-                true gentle giant
-              </span>
-            </div>
+            {heroStats.map((stat, i) => {
+              const hasCount = stat.value.includes("{count}");
+              const display =
+                hasCount && loadingPets
+                  ? "—"
+                  : withCount(stat.value, pets.length);
+              const lines = String(stat.label).split("\n");
+              return (
+                <div className="hero-stat" key={`${stat.label}-${i}`}>
+                  <b>{display}</b>
+                  <span>
+                    {lines.map((line, j) => (
+                      <Fragment key={j}>
+                        {j > 0 && <br />}
+                        {line}
+                      </Fragment>
+                    ))}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -272,39 +287,16 @@ export default function HomePage() {
       {/* (5) trust strip — registries folded into column No.2 */}
       <section className="trust">
         <div className="trust-inner">
-          <span className="label">
-            Why families wait for one of our kittens
-          </span>
-          <h2>Bred with the patience of a much older tradition.</h2>
+          <span className="label">{trustContent.eyebrow}</span>
+          <h2>{trustContent.title}</h2>
           <div className="trust-cols">
-            <div className="trust-col">
-              <span className="trust-col-num">No. 1</span>
-              <h3>Health, proven on paper</h3>
-              <p>
-                Our lines are DNA-tested clear for HCM, SMA and PKD, with cardiac
-                ultrasounds and full DNA panels. Results are shared openly with
-                every family who asks.
-              </p>
-            </div>
-            <div className="trust-col">
-              <span className="trust-col-num">No. 2</span>
-              <h3>Registered pedigree</h3>
-              <p>
-                We register every cat and kitten with the World Cat Federation
-                (WCF) and the Cat Fanciers&rsquo; Association (CFA). Each kitten
-                carries papers tracing to European champion catteries, viewable
-                in full on PawPeds.
-              </p>
-            </div>
-            <div className="trust-col">
-              <span className="trust-col-num">No. 3</span>
-              <h3>Raised underfoot</h3>
-              <p>
-                Kittens grow up in our living room among children and ordinary
-                noise — kept to twelve to sixteen weeks so they are emotionally
-                mature before they go to their new homes.
-              </p>
-            </div>
+            {trustContent.columns.map((col, i) => (
+              <div className="trust-col" key={`${col.num}-${i}`}>
+                <span className="trust-col-num">{col.num}</span>
+                <h3>{col.title}</h3>
+                <p>{col.body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -507,10 +499,12 @@ function HeroSlider({
   title,
   subtitle,
   images,
+  eyebrow,
 }: {
   title: string;
   subtitle: string;
   images: string[];
+  eyebrow: string;
 }) {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -557,9 +551,7 @@ function HeroSlider({
 
       <div className="hero-overlay">
         <div className="hero-overlay-inner">
-          <span className="label hero-eyebrow">
-            WCF &amp; CFA Registered · Maine Coon
-          </span>
+          <span className="label hero-eyebrow">{eyebrow}</span>
           <h1>{title}</h1>
           <p className="hero-sub">{subtitle}</p>
           <div className="hero-ctas">
