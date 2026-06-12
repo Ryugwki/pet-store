@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type React from "react";
 import { Inter, Fraunces } from "next/font/google";
 import "../styles/globals.css";
+import "../styles/heritage.css";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import HideOnAdmin from "@/components/layout/HideOnAdmin";

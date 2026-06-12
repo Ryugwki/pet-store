@@ -65,7 +65,7 @@ export default function Dashboard() {
       />
 
       <Section className="pt-6">
-        <div className="rounded-xl bg-red-700 text-white shadow-md">
+        <div className="rounded-xl bg-[var(--color-footer-bg)] text-[#faf7f2] shadow-md">
           <div className="px-6 py-7 md:px-8 md:py-9">
             <h2 className="text-2xl md:text-3xl font-extrabold items-center justify-between">
               Our kings and queens

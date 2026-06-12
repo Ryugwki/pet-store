@@ -1,12 +1,9 @@
 "use client";
 import { Fragment, useEffect, useRef, useState } from "react";
-import PageHero from "@/components/shared/PageHero";
-import Section from "@/components/shared/Section";
+import Link from "next/link";
 import PetCard from "@/components/shared/PetCard";
-import EmptyState from "@/components/shared/EmptyState";
 import { settingsAPI, petsAPI } from "@/lib/axios";
 import type { Pet } from "@/types";
-import Image from "next/image";
 
 type HomeSection = {
   _id?: string;
@@ -16,6 +13,18 @@ type HomeSection = {
   textColor?: string;
   fontSize?: number;
   order?: number;
+};
+
+type AboutSettings = {
+  title?: string;
+  content?: string;
+  images?: string[];
+};
+
+type ContactSettings = {
+  email?: string;
+  phone?: string;
+  address?: string;
 };
 
 type BackendPet = Omit<Pet, "id"> & {
@@ -33,6 +42,8 @@ export default function HomePage() {
     images?: string[];
   }>({});
   const [sections, setSections] = useState<HomeSection[]>([]);
+  const [about, setAbout] = useState<AboutSettings>({});
+  const [contact, setContact] = useState<ContactSettings>({});
   const [pets, setPets] = useState<BackendPet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
   const [featuredPos, setFeaturedPos] = useState<number>(0);
@@ -56,6 +67,8 @@ export default function HomePage() {
             images?: string[];
           }) || {};
         setHero(h || {});
+        setAbout((res.data?.about as AboutSettings) || {});
+        setContact((res.data?.contact as ContactSettings) || {});
       })
       .catch(() => setSections([]));
     return () => {
@@ -79,61 +92,96 @@ export default function HomePage() {
     };
   }, []);
 
+  // about teaser: first two paragraphs of settings.about.content (mockup parity)
+  const aboutParas = String(about.content || "")
+    .split(/\n+/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+  const aboutPhoto = (about.images || []).filter(Boolean)[0] || "";
+  const telHref = contact.phone
+    ? `tel:${String(contact.phone).replace(/[^+\d]/g, "")}`
+    : "";
+
   return (
     <>
-      {Array.isArray(hero.images) && hero.images.length > 1 ? (
-        <HeroSlider
-          title={hero.title || "Welcome to our Cattery"}
-          subtitle={hero.subtitle || "Healthy, socialized cats and kittens."}
-          images={hero.images}
-        />
-      ) : (
-        <PageHero
-          title={hero.title || "Welcome to our Cattery"}
-          subtitle={hero.subtitle || "Healthy, socialized cats and kittens."}
-          imageSrc={
-            (hero.images && hero.images[0]) || "/images/placeholder.svg"
-          }
-        />
+      {/* (1) full-bleed hero slider over the real hero.images */}
+      <HeroSlider
+        title={hero.title || "Welcome to our Cattery"}
+        subtitle={hero.subtitle || "Healthy, socialized cats and kittens."}
+        images={(hero.images || []).filter(Boolean)}
+      />
+
+      {/* (2) hero-stats band */}
+      <section className="hero-stats-band">
+        <div className="wrap">
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <b>100%</b>
+              <span>
+                Health-tested lines
+                <br />
+                HCM · SMA · PKD
+              </span>
+            </div>
+            <div className="hero-stat">
+              <b>{loadingPets ? "—" : String(pets.length)}</b>
+              <span>
+                Cats in our
+                <br />
+                current catalogue
+              </span>
+            </div>
+            <div className="hero-stat">
+              <b>3–5 yrs</b>
+              <span>
+                The slow maturing of a
+                <br />
+                true gentle giant
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* (3) featured cats — "nursery" section */}
+      {featuredPos === 1 && (
+        <FeaturedNursery pets={pets} loading={loadingPets} />
       )}
-      {/* Admin-managed homepage sections with Featured inserted at selected position */}
+
+      {/* (4) admin-managed homepage sections, Featured inserted at selected position */}
       {sections.map((sec, idx) => {
         const themeClass = `themed-${sec._id || idx}`;
-        // Normalize admin-provided colors so white becomes theme-aware in dark mode
-        const norm = (sec.bgColor || "").trim().toLowerCase();
-        const isWhite =
-          norm === "#fff" ||
-          norm === "#ffffff" ||
-          norm === "white" ||
-          norm === "rgb(255,255,255)" ||
-          norm === "rgba(255,255,255,1)";
-        const bg = isWhite ? "var(--color-card)" : sec.bgColor || "transparent";
-        const color = sec.textColor || "inherit";
+        // Force the Heritage (mockup) palette — ignore the admin-set bgColor/
+        // textColor so every section renders as a clean ivory/charcoal panel.
         const titleSize = sec.fontSize ? `${sec.fontSize}px` : undefined;
         const key = sec._id || `${sec.title}-${sec.order}`;
         return (
           <Fragment key={key}>
-            {featuredPos === idx + 1 && (
-              <FeaturedBlock pets={pets} loading={loadingPets} />
+            {featuredPos === idx + 1 && idx + 1 !== 1 && (
+              <FeaturedNursery pets={pets} loading={loadingPets} />
             )}
-            <Section className="pt-6">
+            <section className="cms-section">
               <style jsx>{`
+                .cms-section {
+                  background: var(--paper, #fffdf8);
+                  border-top: 1px solid var(--hairline, #e6decf);
+                  padding: 64px 0;
+                }
                 .${themeClass} {
-                  background-color: ${bg};
-                  color: ${color};
+                  background-color: var(--color-card);
+                  color: var(--color-text);
                 }
-                /* In dark mode, remove inline white/highlight backgrounds pasted from editors */
-                :global(.dark) .${themeClass} [style*="background"] {
+                /* Force the mockup palette: strip admin/Quill inline colours + highlights */
+                .${themeClass} [style*="background"],
+                .${themeClass} [style*="background-color"],
+                .${themeClass} [class*="ql-bg-"],
+                .${themeClass} mark {
                   background: transparent !important;
-                }
-                :global(.dark) .${themeClass} [style*="background-color"] {
                   background-color: transparent !important;
                 }
-                :global(.dark) .${themeClass} [class*="ql-bg-"] {
-                  background-color: transparent !important;
-                }
-                :global(.dark) .${themeClass} mark {
-                  background: transparent !important;
+                .${themeClass} [style*="color"] {
+                  color: inherit !important;
                 }
                 .${themeClass} ul {
                   list-style: disc !important;
@@ -183,79 +231,150 @@ export default function HomePage() {
                   ${titleSize ? `font-size: ${titleSize};` : ""}
                 }
               `}</style>
-              <div
-                className={`rounded-md border border-border px-6 py-7 md:px-8 md:py-9 ${themeClass}`}
-              >
-                {sec.title && (
-                  <>
-                    <h2
-                      className={`font-serif text-center ${themeClass}-title`}
-                    >
-                      {sec.title}
-                    </h2>
-                    <div className="h-px w-40 mx-auto mt-3 mb-6 bg-[currentColor]" />
-                  </>
-                )}
-                <HtmlContent
-                  className="prose max-w-none [&_*]:!text-inherit [&_*]:!leading-relaxed prose-ul:list-disc prose-ol:list-decimal prose-li:my-1"
-                  html={sec.contentHtml || ""}
-                />
+              <div className="wrap">
+                <div
+                  className={`rounded-md border border-border px-6 py-7 md:px-8 md:py-9 ${themeClass}`}
+                >
+                  {sec.title && (
+                    <>
+                      <h2
+                        className={`font-serif text-center ${themeClass}-title`}
+                      >
+                        {sec.title}
+                      </h2>
+                      <div className="drop-rule mx-auto mt-3 mb-6" />
+                    </>
+                  )}
+                  <HtmlContent
+                    className="prose max-w-none [&_*]:!text-inherit [&_*]:!leading-relaxed prose-ul:list-disc prose-ol:list-decimal prose-li:my-1"
+                    html={sec.contentHtml || ""}
+                  />
+                </div>
               </div>
-            </Section>
+            </section>
           </Fragment>
         );
       })}
       {/* If Featured position is after all sections */}
-      {sections.length + 1 === featuredPos && (
-        <FeaturedBlock pets={pets} loading={loadingPets} />
+      {sections.length + 1 === featuredPos && featuredPos !== 1 && (
+        <FeaturedNursery pets={pets} loading={loadingPets} />
       )}
 
-      {/* Cat registries section */}
-      <Section>
-        <div className="rounded-md border border-border bg-card px-6 py-10 md:px-8 md:py-12">
-          <p className="eyebrow text-center">Registered &amp; Recognized</p>
-          <h2 className="mt-3 text-center font-serif text-3xl md:text-4xl">
-            Cat Registries We Work With
-          </h2>
-          <div className="rule-bronze h-px w-16 mx-auto mt-4 mb-6" />
-          <p className="text-muted-foreground text-lg md:text-xl text-center">
-            We register our cats &amp; kittens with reputable associations.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-14">
-            <div className="flex items-center gap-4">
-              <Image
-                src="/images/logo/World_Cat_Federation_logo.png"
-                alt="World Cat Federation logo"
-                width={48}
-                height={48}
-                className="shrink-0"
-                unoptimized
-              />
-              <span className="font-serif text-xl text-foreground">
-                World Cat Federation
-              </span>
+      {/* (5) trust strip — registries folded into column No.2 */}
+      <section className="trust">
+        <div className="trust-inner">
+          <span className="label">
+            Why families wait for one of our kittens
+          </span>
+          <h2>Bred with the patience of a much older tradition.</h2>
+          <div className="trust-cols">
+            <div className="trust-col">
+              <span className="trust-col-num">No. 1</span>
+              <h3>Health, proven on paper</h3>
+              <p>
+                Our lines are DNA-tested clear for HCM, SMA and PKD, with cardiac
+                ultrasounds and full DNA panels. Results are shared openly with
+                every family who asks.
+              </p>
             </div>
-            <div className="flex items-center gap-4">
-              <Image
-                src="/images/logo/Cat_Fanciers'_Association_new_logo.png"
-                alt="Cat Fanciers Association logo"
-                width={48}
-                height={48}
-                className="shrink-0"
-                unoptimized
-              />
-              <span className="font-serif text-xl text-foreground">
-                Cat Fanciers Association
-              </span>
+            <div className="trust-col">
+              <span className="trust-col-num">No. 2</span>
+              <h3>Registered pedigree</h3>
+              <p>
+                We register every cat and kitten with the World Cat Federation
+                (WCF) and the Cat Fanciers&rsquo; Association (CFA). Each kitten
+                carries papers tracing to European champion catteries, viewable
+                in full on PawPeds.
+              </p>
+            </div>
+            <div className="trust-col">
+              <span className="trust-col-num">No. 3</span>
+              <h3>Raised underfoot</h3>
+              <p>
+                Kittens grow up in our living room among children and ordinary
+                noise — kept to twelve to sixteen weeks so they are emotionally
+                mature before they go to their new homes.
+              </p>
             </div>
           </div>
         </div>
-      </Section>
+      </section>
+
+      {/* (6) about teaser from real settings.about */}
+      {(about.title || aboutParas.length > 0 || aboutPhoto) && (
+        <section className="about">
+          <div className="about-grid">
+            <div className="about-photo">
+              <div
+                className="ph"
+                role="img"
+                aria-label="The cattery at home"
+                style={
+                  aboutPhoto
+                    ? {
+                        backgroundImage: `url("${aboutPhoto}")`,
+                        backgroundColor: "var(--photo-d)",
+                      }
+                    : { backgroundColor: "var(--photo-d)" }
+                }
+              />
+              <p className="ph-caption">At home with the cats</p>
+            </div>
+            <div className="about-copy">
+              <span className="label">The Cattery</span>
+              <h2>{about.title || "About the cattery"}</h2>
+              <div className="drop-rule" />
+              <div>
+                {aboutParas.length > 0 ? (
+                  aboutParas.map((t, i) => <p key={i}>{t}</p>)
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
+              <Link className="textlink" href="/about">
+                Read more about us
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* (7) contact band from real settings.contact */}
+      <section className="cta-band">
+        <div className="cta-inner">
+          <span className="label">Get in touch</span>
+          <h2>Come meet the gentle giants.</h2>
+          <p>
+            Our door is open to fellow Maine Coon lovers. Write to us with your
+            questions, follow the cats as they grow, or arrange a visit to meet
+            them in person.
+          </p>
+          <div className="cta-btns">
+            {contact.email && (
+              <a className="btn btn-ivory-solid" href={`mailto:${contact.email}`}>
+                Say hello
+              </a>
+            )}
+            {contact.phone && (
+              <a className="btn btn-ivory" href={telHref}>
+                Call us
+              </a>
+            )}
+            {!contact.email && !contact.phone && (
+              <Link className="btn btn-ivory-solid" href="/contact">
+                Browse cats
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
 
-function FeaturedBlock({
+// "nursery" featured section — mirrors the mockup #view-home featured strip,
+// fed by the real featured pets already fetched.
+function FeaturedNursery({
   pets,
   loading,
 }: {
@@ -263,26 +382,37 @@ function FeaturedBlock({
   loading: boolean;
 }) {
   return (
-    <Section>
-      {loading ? (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-[320px] bg-muted rounded-xl animate-pulse"
-            />
-          ))}
+    <section className="nursery">
+      <div className="nursery-inner">
+        <div className="section-head">
+          <div>
+            <span className="label">Our Cats</span>
+            <h2>Featured from the cattery</h2>
+            <p>
+              A selection of our kings, queens and rising stars — each listed
+              with its registration colour and home cattery.
+            </p>
+          </div>
         </div>
-      ) : pets.length === 0 ? (
-        <EmptyState description="No featured pets available right now." />
-      ) : (
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow text-center">Our Cattery</p>
-          <h2 className="mt-3 text-center font-serif text-3xl md:text-4xl">
-            Our Kings and Queens
-          </h2>
-          <div className="rule-bronze h-px w-16 mx-auto mt-4 mb-8" />
-          <div className="grid justify-center grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-6">
+        {loading ? (
+          <div className="card-grid">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse"
+                style={{
+                  aspectRatio: "4 / 5",
+                  background: "var(--photo-b)",
+                }}
+              />
+            ))}
+          </div>
+        ) : pets.length === 0 ? (
+          <p style={{ color: "var(--muted)", fontSize: 15 }}>
+            No featured cats available right now.
+          </p>
+        ) : (
+          <div className="card-grid">
             {pets.map((pet) => {
               const mapped: Pet = {
                 id: pet._id,
@@ -330,14 +460,15 @@ function FeaturedBlock({
               );
             })}
           </div>
-        </div>
-      )}
-    </Section>
+        )}
+      </div>
+    </section>
   );
 }
 
-// Full-bleed Heritage hero slider: serif headline + bronze eyebrow + subtitle
-// over a left gradient scrim, with prev/next arrows, dot controls and autoplay.
+// Full-bleed Heritage hero slider — mirrors the mockup .hero structure:
+// .hero-slides cross-fade, .hero-scrim, .hero-overlay with bronze eyebrow,
+// serif headline + subtitle, prev/next arrows, dot controls and autoplay.
 function HeroSlider({
   title,
   subtitle,
@@ -360,11 +491,16 @@ function HeroSlider({
     return () => clearInterval(id);
   }, [paused, count]);
 
-  const go = (i: number) => setCurrent(((i % count) + count) % count);
+  const go = (i: number) => {
+    if (count === 0) return;
+    setCurrent(((i % count) + count) % count);
+  };
+
+  const slides = count > 0 ? images : ["/images/placeholder.svg"];
 
   return (
     <section
-      className="relative overflow-hidden bg-[#16130f]"
+      className="hero"
       aria-roledescription="carousel"
       aria-label="Cattery introduction"
       onMouseEnter={() => setPaused(true)}
@@ -372,96 +508,70 @@ function HeroSlider({
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="relative h-[clamp(440px,70vh,720px)] w-full">
-        {/* stacked cross-fade slides */}
-        {images.map((src, i) => (
+      <div className="hero-slides">
+        {slides.map((src, i) => (
           <div
-            key={src || i}
-            className={`absolute inset-0 transition-opacity duration-[1100ms] ease-out ${
-              i === current ? "opacity-100" : "opacity-0"
-            }`}
+            key={`${src}-${i}`}
+            className={`hero-slide${i === current ? " is-active" : ""}`}
+            style={{ backgroundImage: `url("${src || "/images/placeholder.svg"}")` }}
             aria-hidden={i === current ? undefined : true}
-          >
-            <Image
-              src={src || "/images/placeholder.svg"}
-              alt={`${title} — photo ${i + 1} of ${count}`}
-              fill
-              sizes="100vw"
-              priority={i === 0}
-              className="object-cover object-center"
-            />
-          </div>
+          />
         ))}
+      </div>
 
-        {/* left gradient scrim for legibility (reveals the photo on the right) */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(22,19,15,0.82) 0%, rgba(22,19,15,0.45) 38%, rgba(22,19,15,0.12) 70%, rgba(22,19,15,0.30) 100%)",
-          }}
-          aria-hidden="true"
-        />
+      <div className="hero-scrim" />
 
-        {/* overlaid copy */}
-        <div className="pointer-events-none absolute inset-0 flex items-center">
-          <div className="container mx-auto px-6 md:px-8">
-            <div className="max-w-2xl">
-              <span className="eyebrow block text-[var(--color-bronze-soft)]">
-                WCF &amp; CFA Registered · Maine Coon
-              </span>
-              <h1 className="mt-5 font-serif text-3xl font-light leading-tight text-[#faf7f2] drop-shadow-[0_2px_30px_rgba(0,0,0,0.45)] sm:text-4xl md:text-5xl lg:text-6xl">
-                {title}
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-[rgba(250,247,242,0.92)] drop-shadow md:text-lg">
-                {subtitle}
-              </p>
-            </div>
+      <div className="hero-overlay">
+        <div className="hero-overlay-inner">
+          <span className="label hero-eyebrow">
+            WCF &amp; CFA Registered · Maine Coon
+          </span>
+          <h1>{title}</h1>
+          <p className="hero-sub">{subtitle}</p>
+          <div className="hero-ctas">
+            <Link className="btn btn-ivory-solid" href="/kittens">
+              Meet the cats
+            </Link>
+            <Link className="textlink hero-textlink" href="/about">
+              Our philosophy
+            </Link>
           </div>
         </div>
-
-        {count > 1 && (
-          <>
-            <button
-              type="button"
-              aria-label="Previous photo"
-              onClick={() => go(current - 1)}
-              className="absolute left-4 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(250,247,242,0.5)] bg-[rgba(22,19,15,0.25)] font-serif text-2xl leading-none text-[#faf7f2] backdrop-blur-sm transition hover:bg-[#faf7f2] hover:text-[#26221c] md:left-7"
-            >
-              <span aria-hidden="true">&#8249;</span>
-            </button>
-            <button
-              type="button"
-              aria-label="Next photo"
-              onClick={() => go(current + 1)}
-              className="absolute right-4 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(250,247,242,0.5)] bg-[rgba(22,19,15,0.25)] font-serif text-2xl leading-none text-[#faf7f2] backdrop-blur-sm transition hover:bg-[#faf7f2] hover:text-[#26221c] md:right-7"
-            >
-              <span aria-hidden="true">&#8250;</span>
-            </button>
-            <div
-              className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 gap-3"
-              role="tablist"
-              aria-label="Choose slide"
-            >
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  role="tab"
-                  aria-selected={current === i}
-                  aria-label={`Show photo ${i + 1}`}
-                  onClick={() => go(i)}
-                  className={`h-[9px] rounded-full border transition-all ${
-                    current === i
-                      ? "w-7 border-[var(--color-bronze-soft)] bg-[var(--color-bronze-soft)]"
-                      : "w-[9px] border-[rgba(250,247,242,0.85)] bg-transparent"
-                  }`}
-                />
-              ))}
-            </div>
-          </>
-        )}
       </div>
+
+      {count > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous photo"
+            onClick={() => go(current - 1)}
+            className="hero-arrow hero-prev"
+          >
+            <span aria-hidden="true">&#8249;</span>
+          </button>
+          <button
+            type="button"
+            aria-label="Next photo"
+            onClick={() => go(current + 1)}
+            className="hero-arrow hero-next"
+          >
+            <span aria-hidden="true">&#8250;</span>
+          </button>
+          <div className="hero-dots" role="tablist" aria-label="Choose slide">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={current === i}
+                aria-label={`Show photo ${i + 1}`}
+                onClick={() => go(i)}
+                className={`hero-dot${current === i ? " is-active" : ""}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }
@@ -567,9 +677,9 @@ function HtmlContent({
     });
 
     const bulletTextRe =
-      /^[\s\u00A0\u202F]*(?:[•\u2022\u25CF\u00B7\-*])(\s|\u00A0|\u202F)+/;
+      /^[\s  ]*(?:[••●·\-*])(\s| | )+/;
     const bulletHtmlRe =
-      /^(?:\s|\u00A0|\u202F|&nbsp;|<[^>]+>)*(?:[•\u2022\u25CF\u00B7\-*]|&bull;|&#8226;)(?:\s|\u00A0|\u202F|&nbsp;)+/i;
+      /^(?:\s| | |&nbsp;|<[^>]+>)*(?:[••●·\-*]|&bull;|&#8226;)(?:\s| | |&nbsp;)+/i;
     const stripLeading = (h: string) => h.replace(bulletHtmlRe, "");
 
     const getParas = () =>

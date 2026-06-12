@@ -10,51 +10,88 @@ type PetCardProps = {
   href: string;
 };
 
+// "now" anchor for derived age, matching the mockup's 2026-06-12 snapshot
+const NOW = new Date("2026-06-12T00:00:00.000Z");
+
+// derive age from dob as of NOW: years if >= 1, else months
+function ageFromDob(dob?: string): string {
+  if (!dob) return "—";
+  const d = new Date(dob);
+  if (Number.isNaN(d.getTime())) return "—";
+  let months =
+    (NOW.getFullYear() - d.getFullYear()) * 12 +
+    (NOW.getMonth() - d.getMonth());
+  if (NOW.getDate() < d.getDate()) months -= 1;
+  if (months < 0) months = 0;
+  if (months >= 12) {
+    const yrs = Math.floor(months / 12);
+    return `${yrs} ${yrs === 1 ? "yr" : "yrs"}`;
+  }
+  return `${months} ${months === 1 ? "mo" : "mos"}`;
+}
+
+function fmtDob(dob?: string): string {
+  if (!dob) return "—";
+  const d = new Date(dob);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function genderLabel(g?: string): string {
+  if (g === "male") return "Male";
+  if (g === "female") return "Female";
+  return "—";
+}
+function genderSymbol(g?: string): string {
+  if (g === "male") return "♂ Male";
+  if (g === "female") return "♀ Female";
+  return "Cat";
+}
+
 export default function PetCard({ pet, href }: PetCardProps) {
   const [imgSrc, setImgSrc] = useState<string>(
     (pet.petImages && pet.petImages[0]) || "/images/placeholder.svg"
   );
 
+  const ems = pet.characteristics?.color || "—";
+  const category = pet.category || "Other";
+  const litterStatus =
+    Array.isArray(pet.litter) && pet.litter.length
+      ? pet.litter.filter(Boolean)[0]
+      : null;
+
   return (
-    <div className="relative bg-card text-foreground border border-border rounded-sm shadow-none hover:shadow-md transition-shadow overflow-hidden flex flex-col w-full max-w-[320px] group">
-      <div className="relative w-full aspect-[4/5] bg-muted overflow-hidden">
-        <Link
-          href={href}
-          aria-label={`Open ${pet.name} details`}
-          className="block w-full h-full"
-        >
-          <Image
-            src={imgSrc}
-            alt={`${pet.name} - ${pet.breed}`}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            onError={() => setImgSrc("/images/placeholder.svg")}
-          />
-        </Link>
+    <Link className="pet-card" href={href} aria-label={`Open ${pet.name} details`}>
+      <div className="ph" role="img" aria-label={pet.name}>
+        <Image
+          src={imgSrc}
+          alt={`${pet.name} - ${pet.breed}`}
+          fill
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+          className="object-cover"
+          style={{ position: "absolute", inset: 0 }}
+          onError={() => setImgSrc("/images/placeholder.svg")}
+        />
+        <span className="tag tag-bronze">{genderSymbol(pet.gender)}</span>
       </div>
-      <div className="p-5">
-        {pet.litter?.length > 0 && (
-          <div
-            className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-bronze-deep)] border border-[var(--color-bronze-soft)] bg-[var(--color-card)] px-3 py-1 rounded-full mb-3 inline-block"
-          >
-            Litter: {pet.litter.join(", ")}
-          </div>
-        )}
-        <h3 className="font-serif text-xl font-normal transition-colors group-hover:text-[var(--color-bronze-deep)]">
-          {pet.name}
-        </h3>
-        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          {pet.breed}
-        </p>
-        <Link
-          href={href}
-          aria-label={`View details of ${pet.name}`}
-          className="mt-4 inline-flex items-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-bronze-deep)] border-b border-[var(--color-bronze-soft)] pb-1 transition-colors hover:text-foreground hover:border-foreground"
-        >
-          View Details
-        </Link>
+
+      <h3 className="pet-name">{pet.name}</h3>
+      <p className="pet-ems">
+        {ems} · {category} · {genderLabel(pet.gender)}
+      </p>
+
+      <div className="pet-meta">
+        <span className="pet-dob">
+          b. {fmtDob(pet.dob)} · {ageFromDob(pet.dob)}
+        </span>
+        <span className="pet-line">{pet.cattery || "—"}</span>
       </div>
-    </div>
+
+      {litterStatus && <span className="status-chip">{litterStatus}</span>}
+    </Link>
   );
 }

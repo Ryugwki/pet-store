@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Facebook, PawPrint } from "lucide-react";
 
 export default function Footer() {
   const [year, setYear] = useState<number>();
@@ -10,108 +9,95 @@ export default function Footer() {
   useEffect(() => {
     setYear(new Date().getFullYear());
   }, []);
+
   return (
-    <footer className="bg-[var(--color-footer-bg)] text-[#faf7f2]">
-      <div className="container px-4 py-14 mx-auto">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <div className="flex items-center space-x-2">
-              <PawPrint className="h-6 w-6 text-[var(--color-bronze-soft)]" />
-              <span className="font-serif font-semibold text-xl tracking-tight text-[#faf7f2]">
-                LilyTrinh & DrogonCoon Cattery
-              </span>
-            </div>
-            <p className="mt-4 text-sm text-[#faf7f2]/60">
-              Maine Coon Cattery
-            </p>
-            <div className="flex mt-6 space-x-4">
-              <Link
-                href="#"
-                className="text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-              >
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </Link>
-            </div>
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-semibold text-[var(--color-bronze-soft)]">
-              Pet
-            </h3>
-            <span className="mt-3 block h-px w-10 bg-[var(--color-bronze)]" />
-            <ul className="mt-4 space-y-2.5">
-              <li>
-                <Link
-                  href="/kings"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  Kings
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/queens"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  Queens
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/kittens"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  Kittens
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-semibold text-[var(--color-bronze-soft)]">
-              Organization
-            </h3>
-            <span className="mt-3 block h-px w-10 bg-[var(--color-bronze)]" />
-            <ul className="mt-4 space-y-2.5">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-semibold text-[var(--color-bronze-soft)]">
-              Service
-            </h3>
-            <span className="mt-3 block h-px w-10 bg-[var(--color-bronze)]" />
-            <ul className="mt-4 space-y-2.5">
-              <li>
-                <Link
-                  href="/policy"
-                  className="text-sm text-[#faf7f2]/70 transition-colors hover:text-[var(--color-bronze-soft)]"
-                >
-                  Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="pt-8 mt-10 border-t border-[#faf7f2]/15">
-          <p className="text-xs text-[#faf7f2]/50">
-            &copy; {year ?? "—"} LilyTrinh & DrogonCoon Cattery. All rights
-            reserved.
+    <footer className="site-footer">
+      <div className="footer-grid">
+        {/* brand + blurb */}
+        <div className="footer-brand">
+          <span className="brand-name">LilyTrinh &amp; DrogonCoon Cattery</span>
+          <span className="brand-sub">Maine Coon Cattery</span>
+          <p>
+            A small cattery breeding Maine Coons for health, temperament and the
+            breed&apos;s unmistakable wild grace. WCF &amp; CFA registered,
+            raised underfoot.
           </p>
+        </div>
+
+        {/* Explore */}
+        <div className="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li>
+              <Link href="/kings">Kings</Link>
+            </li>
+            <li>
+              <Link href="/queens">Queens</Link>
+            </li>
+            <li>
+              <Link href="/kittens">Kittens</Link>
+            </li>
+            <li>
+              <Link href="/about">About</Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Visit & Contact */}
+        <div className="footer-col">
+          <h4>Visit &amp; Contact</h4>
+          <address>
+            Ha Noi, Vietnam — by appointment
+            <br />
+            <a href="mailto:lilytrinhcattery@gmail.com">
+              lilytrinhcattery@gmail.com
+            </a>
+            <br />
+            <a href="tel:+84907822385">(+84) 907822385</a>
+            <br />
+            Replies within one day
+          </address>
+        </div>
+
+        {/* Registry */}
+        <div className="footer-col">
+          <h4>Registry</h4>
+          <ul>
+            <li>
+              <a
+                href="https://www.pawpeds.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                PawPeds
+              </a>
+            </li>
+            <li>
+              <Link href="/about">About us</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact</Link>
+            </li>
+            <li>
+              <Link href="/policy">Policy</Link>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <div className="footer-bottom-inner">
+          <span>
+            &copy; {year ?? "—"} LilyTrinh &amp; DrogonCoon Cattery. All rights
+            reserved.
+          </span>
+          <span className="langs">
+            <Link href="/">Home</Link>
+            <a href="#" className="on">
+              EN
+            </a>
+            <a href="#">VI</a>
+          </span>
         </div>
       </div>
     </footer>

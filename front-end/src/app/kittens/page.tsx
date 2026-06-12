@@ -1,16 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import PageHero from "@/components/shared/PageHero";
 import PetCard from "@/components/shared/PetCard";
-import Section from "@/components/shared/Section";
-import EmptyState from "@/components/shared/EmptyState";
 import { petsAPI, settingsAPI } from "@/lib/axios";
 import type { Pet } from "@/types";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 
 type BackendPet = Omit<Pet, "id"> & {
   _id: string;
@@ -18,14 +10,22 @@ type BackendPet = Omit<Pet, "id"> & {
   petImages?: string[];
 };
 
+function genderLabel(g: string): string {
+  if (g === "male") return "Male";
+  if (g === "female") return "Female";
+  return "All";
+}
+
 export default function KittensPage() {
-  // Removed search and filters per request
   const [items, setItems] = useState<BackendPet[]>([]);
   const [hero, setHero] = useState<{
     title?: string;
     subtitle?: string;
     images?: string[];
   }>({});
+  // working filters (mockup #view-cats filter-bar)
+  const [gender, setGender] = useState<string>("");
+  const [cattery, setCattery] = useState<string>("");
 
   useEffect(() => {
     let mounted = true;
@@ -48,10 +48,28 @@ export default function KittensPage() {
     };
   }, []);
 
-  const data = useMemo(() => {
+  // base set for this page (Kittens)
+  const base = useMemo(() => {
     return items.filter((p) => p.category === "Kittens");
   }, [items]);
 
+  // cattery options derived from the base set
+  const catteryOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of base) set.add((p.cattery || "Other").trim());
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [base]);
+
+  // apply the working filters on top of the base set
+  const data = useMemo(() => {
+    return base.filter((p) => {
+      if (gender && p.gender !== gender) return false;
+      if (cattery && (p.cattery || "Other").trim() !== cattery) return false;
+      return true;
+    });
+  }, [base, gender, cattery]);
+
+  // group pets by cattery name
   const groups = useMemo(() => {
     const map = new Map<string, BackendPet[]>();
     for (const p of data) {
@@ -62,120 +80,131 @@ export default function KittensPage() {
     return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [data]);
 
+  const intro =
+    hero.subtitle || "Healthy, socialized kittens ready for loving homes.";
+
+  function clearFilters() {
+    setGender("");
+    setCattery("");
+  }
+
   return (
-    <>
-      {Array.isArray(hero.images) && hero.images.length > 1 ? (
-        <section className="relative">
-          <div className="container mx-auto px-0">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {hero.images.map((src, i) => (
-                  <CarouselItem key={src || i}>
-                    <PageHero
-                      title={hero.title || "Available Kittens"}
-                      subtitle={
-                        hero.subtitle ||
-                        "Healthy, socialized kittens ready for loving homes."
-                      }
-                      imageSrc={src || "/images/placeholder.svg"}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
+    <section className="listing">
+      <div className="listing-hero">
+        <span className="label">The Nursery</span>
+        <h1>{hero.title || "Available Kittens"}</h1>
+        <p>{intro}</p>
+      </div>
+
+      <div className="filter-bar">
+        <div className="filter-inner">
+          <div className="filter-ctl" aria-label="Filter by category">
+            <small>Category</small>
+            <b>Kittens</b>
           </div>
-        </section>
-      ) : (
-        <PageHero
-          title={hero.title || "Available Kittens"}
-          subtitle={
-            hero.subtitle ||
-            "Healthy, socialized kittens ready for loving homes."
-          }
-          imageSrc={
-            (hero.images && hero.images[0]) || "/images/placeholder.svg"
-          }
-        />
-      )}
-      <Section>
-        <div className="max-w-6xl mx-auto mb-12 text-center md:mb-16">
-          <span className="eyebrow block">The Nursery</span>
-          <h2 className="font-serif mt-4 text-3xl font-normal tracking-tight md:text-4xl">
-            {hero.title || "Available Kittens"}
-          </h2>
-          <span
-            aria-hidden="true"
-            className="rule-bronze mx-auto mt-5 block h-px w-14"
-          />
-          <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            {hero.subtitle ||
-              "Healthy, socialized kittens ready for loving homes."}
-          </p>
+          <div className="filter-ctl" aria-label="Filter by gender">
+            <small>Gender</small>
+            <b>{gender ? genderLabel(gender) : "All"}</b>
+            <select
+              aria-label="Gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div className="filter-ctl" aria-label="Filter by cattery">
+            <small>Cattery</small>
+            <b>{cattery || "All"}</b>
+            <select
+              aria-label="Cattery"
+              value={cattery}
+              onChange={(e) => setCattery(e.target.value)}
+            >
+              <option value="">All</option>
+              {catteryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <span className="filter-count">
+            {data.length} {data.length === 1 ? "kitten" : "kittens"}
+          </span>
         </div>
+      </div>
+
+      <div>
         {data.length === 0 ? (
-          <EmptyState description="No kittens available right now." />
-        ) : (
-          <div className="max-w-6xl mx-auto space-y-16">
-            {groups.map(([cattery, pets]) => (
-              <div key={cattery} className="w-full">
-                <div className="mb-10 flex items-baseline gap-6">
-                  <h3 className="font-serif text-2xl font-normal tracking-tight">
-                    {cattery}
-                  </h3>
-                  <span
-                    aria-hidden="true"
-                    className="h-px flex-1 bg-border"
-                  />
-                  <span className="eyebrow shrink-0">
-                    {pets.length} {pets.length === 1 ? "Kitten" : "Kittens"}
-                  </span>
-                </div>
-                <div className="grid justify-center grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-6">
-                  {pets.map((pet) => {
-                    const mapped: Pet = {
-                      id: pet._id,
-                      name: pet.name,
-                      breed: pet.breed,
-                      age: pet.age,
-                      litter: pet.litter ?? [],
-                      category: pet.category ?? undefined,
-                      gender: pet.gender,
-                      dob: pet.dob ?? undefined,
-                      description: pet.description ?? "",
-                      petImages: pet.petImages ?? [],
-                      health: pet.health ?? {
-                        vaccinated: false,
-                        dewormed: false,
-                        healthCertificate: false,
-                      },
-                      characteristics: pet.characteristics ?? {
-                        size: "medium",
-                        color: "",
-                        weight: 0,
-                        personality: [],
-                      },
-                      location: pet.location ?? "",
-                      createdAt:
-                        (pet as unknown as { createdAt?: string }).createdAt ??
-                        new Date().toISOString(),
-                      updatedAt:
-                        (pet as unknown as { updatedAt?: string }).updatedAt ??
-                        new Date().toISOString(),
-                    };
-                    return (
-                      <PetCard
-                        key={mapped.id}
-                        pet={mapped}
-                        href={`/kittens/${mapped.id}`}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          <div className="no-match">
+            <h2>No kittens match those filters</h2>
+            <p>Try widening your selection — or view the whole nursery.</p>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </button>
           </div>
+        ) : (
+          groups.map(([catteryName, pets]) => (
+            <div key={catteryName} className="litter-block">
+              <div className="litter-head">
+                <h2>{catteryName}</h2>
+                <div className="litter-rule" />
+                <span>
+                  {pets.length} {pets.length === 1 ? "kitten" : "kittens"}
+                </span>
+              </div>
+              <div className="listing-grid">
+                {pets.map((pet) => {
+                  const mapped: Pet = {
+                    id: pet._id,
+                    name: pet.name,
+                    breed: pet.breed,
+                    age: pet.age,
+                    litter: pet.litter ?? [],
+                    category: pet.category ?? undefined,
+                    gender: pet.gender,
+                    dob: pet.dob ?? undefined,
+                    description: pet.description ?? "",
+                    petImages: pet.petImages ?? [],
+                    health: pet.health ?? {
+                      vaccinated: false,
+                      dewormed: false,
+                      healthCertificate: false,
+                    },
+                    characteristics: pet.characteristics ?? {
+                      size: "medium",
+                      color: "",
+                      weight: 0,
+                      personality: [],
+                    },
+                    location: pet.location ?? "",
+                    createdAt:
+                      (pet as unknown as { createdAt?: string }).createdAt ??
+                      new Date().toISOString(),
+                    updatedAt:
+                      (pet as unknown as { updatedAt?: string }).updatedAt ??
+                      new Date().toISOString(),
+                  };
+                  return (
+                    <PetCard
+                      key={mapped.id}
+                      pet={mapped}
+                      href={`/kittens/${mapped.id}`}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))
         )}
-      </Section>
-    </>
+      </div>
+    </section>
   );
 }
