@@ -4,15 +4,10 @@ import Link from "next/link";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { settingsAPI } from "@/lib/axios";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import {
-  Menu,
-  X,
   User as UserIcon,
-  PawPrint,
   Settings,
   LogOut,
-  ChevronDown,
   LayoutDashboard,
   Sun,
   Moon,
@@ -26,8 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/cart";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { usePreferencesStore } from "@/store/preferences";
 
 export default function Header() {
@@ -108,348 +101,69 @@ export default function Header() {
     };
   }, []);
 
+  const toggleTheme = useCallback(() => {
+    setTheme(isDark ? "light" : "dark");
+  }, [isDark, setTheme]);
+
   return (
-    <header className="bg-background border-b border-border shadow-sm transition-colors duration-200 relative z-50 overflow-visible">
-      <div className="relative px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center">
-        {/* Logo */}
-        <div className="flex items-center flex-shrink-0">
-          <Link href="/" className="flex items-center space-x-2 group">
-            <PawPrint className="h-6 w-6 text-[var(--color-bronze)]" />
-            <span className="hidden font-serif font-semibold tracking-tight sm:inline-block text-xl text-foreground">
-              {siteName}
-            </span>
-          </Link>
-        </div>
+    <header className="site-nav">
+      <div className="nav-inner">
+        {/* serif wordmark = home link */}
+        <Link className="brand" href="/" aria-label="Cattery home">
+          <span className="brand-name">{siteName}</span>
+          <span className="brand-sub">Maine Coon Cattery</span>
+        </Link>
 
-        {/* Menu center */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 items-center space-x-8">
-          <Link
-            href="/kings"
-            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-          >
+        {/* primary nav */}
+        <nav
+          className={`nav-links${isMenuOpen ? " open" : ""}`}
+          aria-label="Primary"
+        >
+          <Link href="/kings" onClick={() => setIsMenuOpen(false)}>
             Kings
-            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-          <Link
-            href="/queens"
-            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-          >
+          <Link href="/queens" onClick={() => setIsMenuOpen(false)}>
             Queens
-            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-          <Link
-            href="/kittens"
-            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-          >
+          <Link href="/kittens" onClick={() => setIsMenuOpen(false)}>
             Kittens
-            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-          <Link
-            href="/about"
-            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-          >
+          <Link href="/about" onClick={() => setIsMenuOpen(false)}>
             About
-            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-          <Link
-            href="/contact"
-            className="group relative text-sm font-medium tracking-wide text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-          >
+          <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
             Contact
-            <span className="pointer-events-none absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-[var(--color-bronze)] transition-transform duration-200 group-hover:scale-x-100" />
           </Link>
-        </nav>
 
-        {/* Actions right */}
-        <div className="flex items-center justify-end space-x-2">
-          <div className="hidden md:flex items-center gap-2">
-            {/* Theme segmented toggle (desktop) */}
-            <div
-              role="group"
-              aria-label="Theme"
-              className="relative flex items-center rounded-full border border-border bg-card p-0.5"
-              title={isDark ? "Dark mode" : "Light mode"}
-            >
-              <span
-                aria-hidden
-                className={`absolute inset-y-0 my-0.5 w-1/2 rounded-full bg-muted transition-transform duration-200 ${
-                  isDark ? "translate-x-full" : "translate-x-0"
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setTheme("light")}
-                aria-label="Switch to light"
-                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-                  !isDark
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Sun className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme("dark")}
-                aria-label="Switch to dark"
-                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-                  isDark
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Moon className="size-4" />
-              </button>
-            </div>
+          {/* mobile-only auth links — surfaced inside the drawer, hidden on desktop */}
+          <span className="nav-mobile-auth">
             {!isAuthenticated ? (
-              <div className="flex space-x-2">
-                <Link href="/sign-in">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className=" text-foreground hover:bg-muted transition-colors"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] border-none transition-colors dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
-                  >
-                    Sign Up
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Card className="group flex items-center gap-0 p-2 rounded-x-lg border border-border hover:shadow-md transition-all duration-200 bg-card">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        {user?.avatar ? (
-                          <AvatarImage src={user.avatar} alt="Profile" />
-                        ) : (
-                          <AvatarImage
-                            src="/placeholder-avatar.jpg"
-                            alt="Profile"
-                          />
-                        )}
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {user?.name?.[0]?.toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="text-left">
-                        <div className="font-semibold text-card-foreground group-hover:text-primary transition-colors duration-200">
-                          {user?.name || "User"}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {user?.role === "admin" ? "Admin" : "Customer"}
-                        </div>
-                      </div>
-                      <ChevronDown
-                        size={16}
-                        className="text-muted-foreground group-hover:text-primary transition-colors duration-200 ml-1"
-                      />
-                    </div>
-                  </Card>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  sideOffset={8}
-                  className="w-48 shadow-lg border border-border bg-card text-foreground rounded-lg p-1"
-                >
-                  <DropdownMenuItem
-                    onClick={handleProfileClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
-                  >
-                    <UserIcon size={16} className="text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Profile
-                    </span>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onClick={handleSettingsClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
-                  >
-                    <Settings size={16} className="text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Settings
-                    </span>
-                  </DropdownMenuItem>
-
-                  {user?.role === "admin" && (
-                    <DropdownMenuItem
-                      onClick={handleAdminClick}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
-                    >
-                      <LayoutDashboard
-                        size={16}
-                        className="text-muted-foreground"
-                      />
-                      <span className="text-sm font-medium text-foreground">
-                        Admin
-                      </span>
-                    </DropdownMenuItem>
-                  )}
-
-                  <DropdownMenuSeparator className="my-1 bg-border" />
-
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={handleLogoutClick}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer text-foreground"
-                  >
-                    <LogOut size={16} className="text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Logout
-                    </span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-          <div className="md:hidden flex items-center gap-1">
-            {/* Theme segmented toggle (mobile) */}
-            <div
-              role="group"
-              aria-label="Theme"
-              className="relative flex items-center rounded-full border border-border bg-card p-0.5"
-            >
-              <span
-                aria-hidden
-                className={`absolute inset-y-0 my-0.5 w-1/2 rounded-full bg-muted transition-transform duration-200 ${
-                  isDark ? "translate-x-full" : "translate-x-0"
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setTheme("light")}
-                aria-label="Switch to light"
-                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-                  !isDark
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+              <Link
+                href="/sign-in"
+                className="btn-signin-mobile"
+                onClick={() => setIsMenuOpen(false)}
               >
-                <Sun className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme("dark")}
-                aria-label="Switch to dark"
-                className={`relative z-10 size-8 grid place-items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-                  isDark
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Moon className="size-4" />
-              </button>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-1"
-              onClick={() => setIsMenuOpen((v) => !v)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-x-0 top-16 bottom-0 z-[100] bg-background md:hidden overflow-y-auto">
-          <nav className="container grid gap-3 p-6">
-            <Link
-              href="/kittens"
-              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Kittens
-            </Link>
-            <Link
-              href="/kings"
-              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Kings
-            </Link>
-            <Link
-              href="/queens"
-              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Queens
-            </Link>
-            <Link
-              href="/about"
-              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About Us
-            </Link>
-            <Link
-              href="/contact"
-              className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contact Us
-            </Link>
-            <Separator className="my-2 " />
-            {!isAuthenticated ? (
-              <>
-                <Link
-                  href="/sign-in"
-                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign Up
-                </Link>
-              </>
+                Sign In
+              </Link>
             ) : (
               <>
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
                   Profile
                 </Link>
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/settings" onClick={() => setIsMenuOpen(false)}>
                   Settings
                 </Link>
                 {user?.role === "admin" && (
                   <Link
                     href="/admin/dashboard"
-                    className="flex items-center gap-2 font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Admin
                   </Link>
                 )}
                 <button
-                  className="text-left font-serif text-lg font-semibold text-foreground transition-colors hover:text-[var(--color-bronze-deep)]"
+                  type="button"
+                  className="btn-signin-mobile"
                   onClick={() => {
                     handleLogoutClick();
                     setIsMenuOpen(false);
@@ -459,9 +173,123 @@ export default function Header() {
                 </button>
               </>
             )}
-          </nav>
+          </span>
+        </nav>
+
+        {/* actions */}
+        <div className="nav-actions">
+          <button
+            className="icon-btn"
+            type="button"
+            aria-label="Theme"
+            title={isDark ? "Dark mode" : "Light mode"}
+            onClick={toggleTheme}
+          >
+            {isDark ? (
+              <Sun aria-hidden="true" />
+            ) : (
+              <Moon aria-hidden="true" />
+            )}
+          </button>
+
+          {!isAuthenticated ? (
+            <Link className="btn-signin" href="/sign-in">
+              Sign In
+            </Link>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="icon-btn"
+                  aria-label="Account menu"
+                  title={user?.name || "Account"}
+                >
+                  <Avatar className="h-[34px] w-[34px]">
+                    {user?.avatar ? (
+                      <AvatarImage src={user.avatar} alt="Profile" />
+                    ) : (
+                      <AvatarImage
+                        src="/placeholder-avatar.jpg"
+                        alt="Profile"
+                      />
+                    )}
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {user?.name?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={8}
+                className="w-48 shadow-lg border border-border bg-card text-foreground rounded-lg p-1"
+              >
+                <DropdownMenuItem
+                  onClick={handleProfileClick}
+                  className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
+                >
+                  <UserIcon size={16} className="text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    Profile
+                  </span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={handleSettingsClick}
+                  className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
+                >
+                  <Settings size={16} className="text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    Settings
+                  </span>
+                </DropdownMenuItem>
+
+                {user?.role === "admin" && (
+                  <DropdownMenuItem
+                    onClick={handleAdminClick}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer"
+                  >
+                    <LayoutDashboard
+                      size={16}
+                      className="text-muted-foreground"
+                    />
+                    <span className="text-sm font-medium text-foreground">
+                      Admin
+                    </span>
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuSeparator className="my-1 bg-border" />
+
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleLogoutClick}
+                  className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors duration-200 cursor-pointer text-foreground"
+                >
+                  <LogOut size={16} className="text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    Logout
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {/* mobile burger */}
+          <button
+            className="nav-burger"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((v) => !v)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
-      )}
+      </div>
     </header>
   );
 }

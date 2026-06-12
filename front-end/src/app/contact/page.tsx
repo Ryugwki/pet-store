@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { settingsAPI } from "@/lib/axios";
-import Section from "@/components/shared/Section";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Mail, Phone, MapPin, Copy, Check, MessageSquare } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 type Contact = {
   email?: string;
@@ -80,202 +76,201 @@ export default function ContactPage() {
     } catch {}
   };
 
+  const tel = contact.phone ? contact.phone.replace(/[^+\d]/g, "") : "";
+  const mapCaption =
+    contact.address || (mapEmbedHtml ? "Find us" : "Location by appointment");
+
   return (
-    <Section title="Contact">
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-        {/* left column: details and actions */}
-        <div className="space-y-6">
-          <Card className="p-5 md:p-6 space-y-4 md:space-y-5 bg-card border-border">
-            <p className="eyebrow">Get in Touch</p>
-            {loading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-40" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : contact.content ? (
-              <p className="text-foreground whitespace-pre-line font-serif text-lg md:text-xl leading-relaxed">
-                {contact.content}
-              </p>
-            ) : (
-              <p className="text-muted-foreground font-serif text-lg">
-                We&apos;d love to hear from you.
-              </p>
-            )}
+    <section className="concept" id="view-contact">
+      <div className="listing-hero">
+        <span className="label">Get in touch</span>
+        <h1>Contact</h1>
+        <p>
+          Our door is open to fellow Maine Coon lovers — questions, a visit, or
+          just to follow the cats as they grow.
+        </p>
+      </div>
 
-            <div className="space-y-3">
-              {/* email */}
-              {loading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : contact.email ? (
-                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
-                      <Mail className="h-4 w-4" />
-                    </span>
-                    <a
-                      href={`mailto:${contact.email}`}
-                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
-                    >
-                      {contact.email}
-                    </a>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-[var(--color-bronze-deep)]"
-                    onClick={() => handleCopy("email", contact.email)}
-                    aria-label="Copy email"
-                  >
-                    {copied.key === "email" ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              ) : null}
+      <section className="wrap" style={{ padding: "0 32px 92px" }}>
+        <div className="contact-grid">
+          <div className="contact-details">
+            <span className="label">The cattery</span>
+            <div className="drop-rule" />
 
-              {/* phone */}
+            <ul className="contact-list" id="contactList">
               {loading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : contact.phone ? (
-                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
-                      <Phone className="h-4 w-4" />
-                    </span>
-                    <a
-                      href={`tel:${contact.phone}`}
-                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
-                    >
-                      {contact.phone}
-                    </a>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-[var(--color-bronze-deep)]"
-                    onClick={() => handleCopy("phone", contact.phone)}
-                    aria-label="Copy phone"
-                  >
-                    {copied.key === "phone" ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              ) : null}
-
-              {/* address */}
-              {loading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : contact.address ? (
-                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
-                      <MapPin className="h-4 w-4" />
-                    </span>
-                    <p
-                      className="text-sm leading-6 break-words"
-                      title={contact.address}
-                    >
-                      {contact.address}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {mapsHref && (
-                      <Button
-                        asChild
-                        size="sm"
-                        className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze)]"
-                      >
-                        <a href={mapsHref} target="_blank" rel="noreferrer">
-                          <span className="hidden sm:inline">
-                            Open in Google Maps
-                          </span>
-                          <span className="sm:hidden inline">Open Maps</span>
+                <li>
+                  <span className="ct-v">Loading contact details…</span>
+                </li>
+              ) : (
+                <>
+                  {contact.address && (
+                    <li>
+                      <span className="ct-k">Visit</span>
+                      <span className="ct-v">
+                        {contact.address} · by appointment
+                        <button
+                          type="button"
+                          className="ct-copy"
+                          onClick={() => handleCopy("address", contact.address)}
+                          aria-label="Copy address"
+                        >
+                          {copied.key === "address" ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </span>
+                    </li>
+                  )}
+                  {contact.email && (
+                    <li>
+                      <span className="ct-k">Email</span>
+                      <span className="ct-v">
+                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                        <button
+                          type="button"
+                          className="ct-copy"
+                          onClick={() => handleCopy("email", contact.email)}
+                          aria-label="Copy email"
+                        >
+                          {copied.key === "email" ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </span>
+                    </li>
+                  )}
+                  {contact.phone && (
+                    <li>
+                      <span className="ct-k">Phone</span>
+                      <span className="ct-v">
+                        <a href={`tel:${tel}`}>{contact.phone}</a>
+                        <button
+                          type="button"
+                          className="ct-copy"
+                          onClick={() => handleCopy("phone", contact.phone)}
+                          aria-label="Copy phone"
+                        >
+                          {copied.key === "phone" ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </span>
+                    </li>
+                  )}
+                  {contact.imessage && (
+                    <li>
+                      <span className="ct-k">iMessage</span>
+                      <span className="ct-v">
+                        <a
+                          href={`imessage:${encodeURIComponent(
+                            contact.imessage
+                          )}`}
+                        >
+                          {contact.imessage}
                         </a>
-                      </Button>
+                        <button
+                          type="button"
+                          className="ct-copy"
+                          onClick={() =>
+                            handleCopy("imessage", contact.imessage)
+                          }
+                          aria-label="Copy iMessage"
+                        >
+                          {copied.key === "imessage" ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </span>
+                    </li>
+                  )}
+                  {!contact.address &&
+                    !contact.email &&
+                    !contact.phone &&
+                    !contact.imessage && (
+                      <li>
+                        <span className="ct-v">
+                          Contact details coming soon.
+                        </span>
+                      </li>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:text-[var(--color-bronze-deep)]"
-                      onClick={() => handleCopy("address", contact.address)}
-                      aria-label="Copy address"
-                    >
-                      {copied.key === "address" ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
+                </>
+              )}
+            </ul>
 
-              {/* iMessage */}
-              {loading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : contact.imessage ? (
-                <div className="flex items-center justify-between gap-3 border border-border bg-muted px-3 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-8 w-8 bg-card text-[var(--color-bronze-deep)] grid place-items-center border border-border">
-                      <MessageSquare className="h-4 w-4" />
-                    </span>
-                    <a
-                      href={`imessage:${encodeURIComponent(contact.imessage)}`}
-                      className="break-words sm:truncate hover:text-[var(--color-bronze-deep)]"
-                      title={contact.imessage}
-                    >
-                      iMessage: {contact.imessage}
-                    </a>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-[var(--color-bronze-deep)]"
-                    onClick={() => handleCopy("imessage", contact.imessage)}
-                    aria-label="Copy iMessage"
-                  >
-                    {copied.key === "imessage" ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              ) : null}
-            </div>
+            {!loading && contact.content && contact.content.trim() && (
+              <div className="contact-note" id="contactNote">
+                {contact.content.trim()}
+              </div>
+            )}
 
             {error && !loading && (
-              <p className="text-sm text-[var(--color-bronze-deep)]">{error}</p>
+              <div className="contact-note" id="contactError">
+                {error}
+              </div>
             )}
-          </Card>
-        </div>
 
-        {/* right column: map */}
-        <div>
-          <Card className="p-2 md:p-3 bg-card border-border">
-            {loading ? (
-              <Skeleton className="aspect-video w-full rounded" />
-            ) : mapEmbedHtml ? (
-              <div className="aspect-video w-full overflow-hidden border border-border bg-card">
+            <div
+              className="hero-ctas"
+              style={{ marginTop: 26 }}
+              id="contactPageBtns"
+            >
+              {contact.email && (
+                <a className="btn btn-solid" href={`mailto:${contact.email}`}>
+                  Write to us
+                </a>
+              )}
+              {contact.phone && (
+                <a className="btn btn-outline" href={`tel:${tel}`}>
+                  Call the cattery
+                </a>
+              )}
+              {mapsHref && (
+                <a
+                  className="textlink"
+                  href={mapsHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in Google Maps
+                </a>
+              )}
+            </div>
+          </div>
+
+          <div className="contact-map">
+            {mapEmbedHtml ? (
+              <div
+                className="map-frame"
+                id="contactMap"
+                dangerouslySetInnerHTML={{ __html: mapEmbedHtml }}
+              />
+            ) : (
+              <div className="map-frame" id="contactMap">
                 <div
-                  className="h-full w-full"
-                  dangerouslySetInnerHTML={{ __html: mapEmbedHtml }}
+                  className="ph"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "var(--cream)",
+                  }}
                 />
               </div>
-            ) : (
-              <div className="aspect-video w-full border border-border grid place-items-center text-muted-foreground">
-                Map not available
-              </div>
             )}
-          </Card>
+            <p className="ph-caption" id="contactMapCaption">
+              {mapCaption}
+            </p>
+          </div>
         </div>
-      </div>
-    </Section>
+      </section>
+    </section>
   );
 }
