@@ -31,6 +31,19 @@ import {
 import CenteredAlert, { type Banner } from "@/components/shared/CenteredAlert";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { handleAPIError, petsAPI, settingsAPI, uploadsAPI } from "@/lib/axios";
+import {
+  DEFAULT_HOME_MARKETING,
+  DEFAULT_POLICY,
+  DEFAULT_PRICING,
+  DEFAULT_TRUST,
+  type HomeMarketing,
+  type HomeStat,
+  type PolicyContent,
+  type PricingContent,
+  type ReservationStep,
+  type TrustColumn,
+  type TrustContent,
+} from "@/constants/siteDefaults";
 
 type PageKey = "home" | "kings" | "queens" | "kittens";
 type HeroSection = { title?: string; subtitle?: string; images?: string[] };
@@ -60,6 +73,12 @@ type Settings = {
   sections?: Section[];
   featuredPetIds?: string[];
   featuredPosition?: number;
+  // Home & Marketing (mirrors siteDefaults shapes; ADDITIVE, falls back to DEFAULT_*)
+  home?: Partial<HomeMarketing>;
+  trust?: Partial<TrustContent>;
+  // Policy & Pricing
+  policy?: Partial<PolicyContent>;
+  pricing?: Partial<PricingContent>;
 };
 
 const clamp = (n: number, min: number, max: number) =>
@@ -114,6 +133,52 @@ export default function AdminSettingsPage() {
             1,
             (data.sections?.length || 0) + 1
           ),
+          // Home & Marketing — fall back to current hardcoded defaults so the
+          // site looks identical until the owner edits these.
+          home: {
+            eyebrow: data.home?.eyebrow ?? DEFAULT_HOME_MARKETING.eyebrow,
+            stats:
+              data.home?.stats && data.home.stats.length > 0
+                ? data.home.stats.map((x) => ({
+                    value: x?.value ?? "",
+                    label: x?.label ?? "",
+                  }))
+                : DEFAULT_HOME_MARKETING.stats.map((x) => ({ ...x })),
+          },
+          trust: {
+            eyebrow: data.trust?.eyebrow ?? DEFAULT_TRUST.eyebrow,
+            title: data.trust?.title ?? DEFAULT_TRUST.title,
+            columns:
+              data.trust?.columns && data.trust.columns.length > 0
+                ? data.trust.columns.map((x) => ({
+                    num: x?.num ?? "",
+                    title: x?.title ?? "",
+                    body: x?.body ?? "",
+                  }))
+                : DEFAULT_TRUST.columns.map((x) => ({ ...x })),
+          },
+          // Policy & Pricing
+          policy: {
+            intro: data.policy?.intro ?? DEFAULT_POLICY.intro ?? "",
+            bullets:
+              data.policy?.bullets && data.policy.bullets.length > 0
+                ? [...data.policy.bullets]
+                : [...DEFAULT_POLICY.bullets],
+            reservation:
+              data.policy?.reservation && data.policy.reservation.length > 0
+                ? data.policy.reservation.map((x) => ({
+                    title: x?.title ?? "",
+                    body: x?.body ?? "",
+                  }))
+                : DEFAULT_POLICY.reservation.map((x) => ({ ...x })),
+          },
+          pricing: {
+            basePrice: data.pricing?.basePrice ?? DEFAULT_PRICING.basePrice,
+            currency: data.pricing?.currency ?? DEFAULT_PRICING.currency,
+            deposit: data.pricing?.deposit ?? DEFAULT_PRICING.deposit,
+            vndRate: data.pricing?.vndRate ?? DEFAULT_PRICING.vndRate,
+            litterYear: data.pricing?.litterYear ?? DEFAULT_PRICING.litterYear,
+          },
         };
         setSettings(normalized);
       } catch (err) {
@@ -152,6 +217,28 @@ export default function AdminSettingsPage() {
     setSettings((s) => ({
       ...(s || {}),
       contact: { ...(s.contact || {}), ...partial },
+    }));
+  // Home & Marketing setters
+  const setHome = (partial: Partial<HomeMarketing>) =>
+    setSettings((s) => ({
+      ...(s || {}),
+      home: { ...(s.home || {}), ...partial },
+    }));
+  const setTrust = (partial: Partial<TrustContent>) =>
+    setSettings((s) => ({
+      ...(s || {}),
+      trust: { ...(s.trust || {}), ...partial },
+    }));
+  // Policy & Pricing setters
+  const setPolicy = (partial: Partial<PolicyContent>) =>
+    setSettings((s) => ({
+      ...(s || {}),
+      policy: { ...(s.policy || {}), ...partial },
+    }));
+  const setPricing = (partial: Partial<PricingContent>) =>
+    setSettings((s) => ({
+      ...(s || {}),
+      pricing: { ...(s.pricing || {}), ...partial },
     }));
 
   const save = async () => {
@@ -336,7 +423,7 @@ export default function AdminSettingsPage() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-muted border border-border gap-1 p-1">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-muted border border-border gap-1 p-1 h-auto">
           <TabsTrigger
             value="general"
             className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
@@ -360,6 +447,18 @@ export default function AdminSettingsPage() {
             className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
           >
             Contact
+          </TabsTrigger>
+          <TabsTrigger
+            value="home-marketing"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
+          >
+            Home &amp; Marketing
+          </TabsTrigger>
+          <TabsTrigger
+            value="policy-pricing"
+            className="rounded-md text-muted-foreground hover:bg-background transition-all data-[state=active]:!bg-[#26221c] data-[state=active]:!text-[#faf7f2] dark:data-[state=active]:!bg-[#faf7f2] dark:data-[state=active]:!text-[#26221c]"
+          >
+            Policy &amp; Pricing
           </TabsTrigger>
         </TabsList>
 
@@ -788,40 +887,6 @@ export default function AdminSettingsPage() {
                         </div>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="grid gap-1">
-                            <Label>Background</Label>
-                            <Input
-                              type="color"
-                              value={sec.bgColor || "#ffffff"}
-                              onChange={(e) =>
-                                setSettings((s) => ({
-                                  ...(s || {}),
-                                  sections: (s?.sections || []).map((x, i) =>
-                                    i === idx
-                                      ? { ...x, bgColor: e.target.value }
-                                      : x
-                                  ),
-                                }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-1">
-                            <Label>Text color</Label>
-                            <Input
-                              type="color"
-                              value={sec.textColor || "#111827"}
-                              onChange={(e) =>
-                                setSettings((s) => ({
-                                  ...(s || {}),
-                                  sections: (s?.sections || []).map((x, i) =>
-                                    i === idx
-                                      ? { ...x, textColor: e.target.value }
-                                      : x
-                                  ),
-                                }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-1">
                             <Label>Font size (px)</Label>
                             <Input
                               type="number"
@@ -844,6 +909,9 @@ export default function AdminSettingsPage() {
                             />
                           </div>
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          Section colours follow the site theme.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -1109,6 +1177,453 @@ export default function AdminSettingsPage() {
                   rows={4}
                   value={settings.contact?.content || ""}
                   onChange={(e) => setContact({ content: e.target.value })}
+                />
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="home-marketing" className="space-y-4">
+          {/* Hero eyebrow + 3-stat band */}
+          <Card className="p-5 space-y-4 border-border shadow-sm">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-semibold">
+              Home Hero
+            </CardTitle>
+            <div className="grid gap-1">
+              <Label htmlFor="homeEyebrow">Hero eyebrow</Label>
+              <Input
+                id="homeEyebrow"
+                value={settings.home?.eyebrow ?? ""}
+                placeholder={DEFAULT_HOME_MARKETING.eyebrow}
+                onChange={(e) => setHome({ eyebrow: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Small label shown above the home hero headline.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Hero stats (the 3-stat band)</Label>
+                <Button
+                  type="button"
+                  className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
+                  onClick={() =>
+                    setHome({
+                      stats: [
+                        ...(settings.home?.stats || []),
+                        { value: "", label: "" } as HomeStat,
+                      ],
+                    })
+                  }
+                >
+                  Add stat
+                </Button>
+              </div>
+              {(settings.home?.stats || []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No stats yet.</p>
+              )}
+              {(settings.home?.stats || []).map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-md border border-border bg-background p-3 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-sm text-[var(--color-bronze-deep)]">
+                      Stat #{idx + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
+                      onClick={() =>
+                        setHome({
+                          stats: (settings.home?.stats || []).filter(
+                            (_, i) => i !== idx
+                          ),
+                        })
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-1">
+                      <Label htmlFor={`statValue-${idx}`}>Value</Label>
+                      <Input
+                        id={`statValue-${idx}`}
+                        value={stat.value || ""}
+                        placeholder="e.g. 100% or {count}"
+                        onChange={(e) =>
+                          setHome({
+                            stats: (settings.home?.stats || []).map((x, i) =>
+                              i === idx ? { ...x, value: e.target.value } : x
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <Label htmlFor={`statLabel-${idx}`}>Label</Label>
+                      <Textarea
+                        id={`statLabel-${idx}`}
+                        rows={2}
+                        value={stat.label || ""}
+                        placeholder="Use a new line to wrap the caption"
+                        onChange={(e) =>
+                          setHome({
+                            stats: (settings.home?.stats || []).map((x, i) =>
+                              i === idx ? { ...x, label: e.target.value } : x
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground">
+                Use the token <code>{"{count}"}</code> in a value to show the
+                live catalogue size.
+              </p>
+            </div>
+          </Card>
+
+          {/* Trust strip */}
+          <Card className="p-5 space-y-4 border-border shadow-sm">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-semibold">
+              Trust strip
+            </CardTitle>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-1">
+                <Label htmlFor="trustEyebrow">Eyebrow</Label>
+                <Input
+                  id="trustEyebrow"
+                  value={settings.trust?.eyebrow ?? ""}
+                  placeholder={DEFAULT_TRUST.eyebrow}
+                  onChange={(e) => setTrust({ eyebrow: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="trustTitle">Title</Label>
+                <Input
+                  id="trustTitle"
+                  value={settings.trust?.title ?? ""}
+                  placeholder={DEFAULT_TRUST.title}
+                  onChange={(e) => setTrust({ title: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Columns</Label>
+                <Button
+                  type="button"
+                  className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
+                  onClick={() =>
+                    setTrust({
+                      columns: [
+                        ...(settings.trust?.columns || []),
+                        { num: "", title: "", body: "" } as TrustColumn,
+                      ],
+                    })
+                  }
+                >
+                  Add column
+                </Button>
+              </div>
+              {(settings.trust?.columns || []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No columns yet.</p>
+              )}
+              {(settings.trust?.columns || []).map((col, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-md border border-border bg-background p-3 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-sm text-[var(--color-bronze-deep)]">
+                      Column #{idx + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
+                      onClick={() =>
+                        setTrust({
+                          columns: (settings.trust?.columns || []).filter(
+                            (_, i) => i !== idx
+                          ),
+                        })
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-1">
+                      <Label htmlFor={`colNum-${idx}`}>Number</Label>
+                      <Input
+                        id={`colNum-${idx}`}
+                        value={col.num || ""}
+                        placeholder="e.g. No. 1"
+                        onChange={(e) =>
+                          setTrust({
+                            columns: (settings.trust?.columns || []).map(
+                              (x, i) =>
+                                i === idx ? { ...x, num: e.target.value } : x
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <Label htmlFor={`colTitle-${idx}`}>Title</Label>
+                      <Input
+                        id={`colTitle-${idx}`}
+                        value={col.title || ""}
+                        onChange={(e) =>
+                          setTrust({
+                            columns: (settings.trust?.columns || []).map(
+                              (x, i) =>
+                                i === idx ? { ...x, title: e.target.value } : x
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-1">
+                    <Label htmlFor={`colBody-${idx}`}>Body</Label>
+                    <Textarea
+                      id={`colBody-${idx}`}
+                      rows={3}
+                      value={col.body || ""}
+                      onChange={(e) =>
+                        setTrust({
+                          columns: (settings.trust?.columns || []).map((x, i) =>
+                            i === idx ? { ...x, body: e.target.value } : x
+                          ),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="policy-pricing" className="space-y-4">
+          {/* Policy */}
+          <Card className="p-5 space-y-4 border-border shadow-sm">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-semibold">
+              Policy
+            </CardTitle>
+            <div className="grid gap-1">
+              <Label htmlFor="policyIntro">Intro</Label>
+              <Textarea
+                id="policyIntro"
+                rows={4}
+                value={settings.policy?.intro ?? ""}
+                placeholder={DEFAULT_POLICY.intro || ""}
+                onChange={(e) => setPolicy({ intro: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Bullets</Label>
+                <Button
+                  type="button"
+                  className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
+                  onClick={() =>
+                    setPolicy({
+                      bullets: [...(settings.policy?.bullets || []), ""],
+                    })
+                  }
+                >
+                  Add bullet
+                </Button>
+              </div>
+              {(settings.policy?.bullets || []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No bullets yet.</p>
+              )}
+              {(settings.policy?.bullets || []).map((bullet, idx) => (
+                <div key={idx} className="flex items-start gap-2">
+                  <Input
+                    aria-label={`Policy bullet ${idx + 1}`}
+                    value={bullet || ""}
+                    onChange={(e) =>
+                      setPolicy({
+                        bullets: (settings.policy?.bullets || []).map((x, i) =>
+                          i === idx ? e.target.value : x
+                        ),
+                      })
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
+                    onClick={() =>
+                      setPolicy({
+                        bullets: (settings.policy?.bullets || []).filter(
+                          (_, i) => i !== idx
+                        ),
+                      })
+                    }
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Reservation steps</Label>
+                <Button
+                  type="button"
+                  className="bg-[var(--color-bronze)] text-[#fffdf8] hover:bg-[var(--color-bronze-deep)]"
+                  onClick={() =>
+                    setPolicy({
+                      reservation: [
+                        ...(settings.policy?.reservation || []),
+                        { title: "", body: "" } as ReservationStep,
+                      ],
+                    })
+                  }
+                >
+                  Add step
+                </Button>
+              </div>
+              {(settings.policy?.reservation || []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No steps yet.</p>
+              )}
+              {(settings.policy?.reservation || []).map((step, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-md border border-border bg-background p-3 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-sm text-[var(--color-bronze-deep)]">
+                      Step #{idx + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="text-[#fffdf8] bg-[var(--color-bronze)] hover:bg-[var(--color-bronze-deep)]"
+                      onClick={() =>
+                        setPolicy({
+                          reservation: (
+                            settings.policy?.reservation || []
+                          ).filter((_, i) => i !== idx),
+                        })
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-1">
+                    <Label htmlFor={`resTitle-${idx}`}>Title</Label>
+                    <Input
+                      id={`resTitle-${idx}`}
+                      value={step.title || ""}
+                      onChange={(e) =>
+                        setPolicy({
+                          reservation: (settings.policy?.reservation || []).map(
+                            (x, i) =>
+                              i === idx ? { ...x, title: e.target.value } : x
+                          ),
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-1">
+                    <Label htmlFor={`resBody-${idx}`}>Body</Label>
+                    <Textarea
+                      id={`resBody-${idx}`}
+                      rows={3}
+                      value={step.body || ""}
+                      placeholder="Use {price} to show the formatted price"
+                      onChange={(e) =>
+                        setPolicy({
+                          reservation: (settings.policy?.reservation || []).map(
+                            (x, i) =>
+                              i === idx ? { ...x, body: e.target.value } : x
+                          ),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Pricing */}
+          <Card className="p-5 space-y-4 border-border shadow-sm">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-semibold">
+              Pricing
+            </CardTitle>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-1">
+                <Label htmlFor="pricingBase">Base price</Label>
+                <Input
+                  id="pricingBase"
+                  type="number"
+                  value={settings.pricing?.basePrice ?? ""}
+                  placeholder={String(DEFAULT_PRICING.basePrice)}
+                  onChange={(e) =>
+                    setPricing({ basePrice: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="pricingCurrency">Currency</Label>
+                <Input
+                  id="pricingCurrency"
+                  value={settings.pricing?.currency ?? ""}
+                  placeholder={DEFAULT_PRICING.currency}
+                  onChange={(e) => setPricing({ currency: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="pricingDeposit">Deposit</Label>
+                <Input
+                  id="pricingDeposit"
+                  type="number"
+                  value={settings.pricing?.deposit ?? ""}
+                  placeholder={String(DEFAULT_PRICING.deposit)}
+                  onChange={(e) =>
+                    setPricing({ deposit: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="pricingVnd">VND rate</Label>
+                <Input
+                  id="pricingVnd"
+                  type="number"
+                  value={settings.pricing?.vndRate ?? ""}
+                  placeholder={String(DEFAULT_PRICING.vndRate)}
+                  onChange={(e) =>
+                    setPricing({ vndRate: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="pricingLitterYear">Litter year</Label>
+                <Input
+                  id="pricingLitterYear"
+                  value={settings.pricing?.litterYear ?? ""}
+                  placeholder={DEFAULT_PRICING.litterYear}
+                  onChange={(e) => setPricing({ litterYear: e.target.value })}
                 />
               </div>
             </div>

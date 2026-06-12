@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { settingsAPI } from "@/lib/axios";
+import { safeMapEmbed } from "@/lib/sanitizeHtml";
 import { Copy, Check } from "lucide-react";
 
 type Contact = {
   email?: string;
   phone?: string;
   address?: string;
-  facebook?: string;
   imessage?: string;
   mapEmbed?: string;
   content?: string;
@@ -54,12 +54,17 @@ export default function ContactPage() {
         : null,
     [contact.address]
   );
-  // derive an embed when only address is provided
+  // derive an embed when only address is provided; render only validated
+  // Google Maps iframes (safeMapEmbed returns "" for anything else).
   const mapEmbedHtml = useMemo(() => {
-    if (contact.mapEmbed && contact.mapEmbed.trim()) return contact.mapEmbed;
+    if (contact.mapEmbed && contact.mapEmbed.trim()) {
+      return safeMapEmbed(contact.mapEmbed);
+    }
     if (contact.address && contact.address.trim()) {
       const q = encodeURIComponent(contact.address);
-      return `<iframe src="https://www.google.com/maps?q=${q}&output=embed" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+      return safeMapEmbed(
+        `<iframe src="https://www.google.com/maps?q=${q}&output=embed" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
+      );
     }
     return "";
   }, [contact.mapEmbed, contact.address]);

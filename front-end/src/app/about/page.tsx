@@ -7,17 +7,28 @@ type About = { title?: string; content?: string; images?: string[] };
 
 export default function AboutPage() {
   const [about, setAbout] = useState<About>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     settingsAPI
       .get()
       .then((res) => {
         if (!mounted) return;
         const data = res.data as { about?: About };
         setAbout(data.about || {});
+        setError(null);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!mounted) return;
+        setError("Failed to load about info");
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
     return () => {
       mounted = false;
     };
@@ -72,14 +83,21 @@ export default function AboutPage() {
             <span className="label">Our story</span>
             <div className="drop-rule" />
             <div id="aboutPageBody">
-              {paragraphs.length ? (
+              {loading ? (
+                <p>Loading…</p>
+              ) : paragraphs.length ? (
                 paragraphs.map((p, i) => <p key={i}>{p}</p>)
               ) : (
                 <p>—</p>
               )}
             </div>
+            {error && !loading && (
+              <div className="contact-note" id="aboutError">
+                {error}
+              </div>
+            )}
             <div className="hero-ctas" style={{ marginTop: 8 }}>
-              <Link className="btn btn-solid" href="/cats">
+              <Link className="btn btn-solid" href="/kittens">
                 Meet the cats
               </Link>
               <Link className="textlink" href="/contact">

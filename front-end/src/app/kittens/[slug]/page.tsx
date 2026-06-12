@@ -2,10 +2,12 @@ export const runtime = "edge"; // Required by Cloudflare Pages for this dynamic 
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import type { Pet } from "@/types";
+import type { Pet, PetParentRef } from "@/types";
 import DetailGallery from "@/components/shared/DetailGallery";
 import ZoomableImage from "@/components/shared/ZoomableImage";
 import { API_BASE_URL } from "@/constants";
+import { ageFromDob } from "@/lib/age";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 
 async function getPet(id: string): Promise<Pet> {
   // id is used in the fetch call; rename to avoid lint false positive if configured
@@ -30,6 +32,13 @@ async function getPet(id: string): Promise<Pet> {
     awardsImages: data.awardsImages ?? [],
     certificateImages: data.certificateImages ?? [],
     cattery: data.cattery,
+    // Structured lineage / breeding metadata (additive — older payloads omit these).
+    coi: data.coi,
+    registry: data.registry,
+    fatherId: data.fatherId,
+    motherId: data.motherId,
+    father: normalizeParent(data.father),
+    mother: normalizeParent(data.mother),
     health: data.health ?? {
       vaccinated: false,
       dewormed: false,
@@ -47,24 +56,33 @@ async function getPet(id: string): Promise<Pet> {
   } as Pet;
 }
 
-/* ---------- mockup-faithful display helpers ---------- */
-// "now" anchor for derived age, matching the mockup's 2026-06-12 snapshot
-const NOW = new Date("2026-06-12T00:00:00.000Z");
+// Normalize a populated parent object from GET /pets/:id. The backend may
+// populate `father`/`mother` as full pet docs (with `_id`) or leave them as a
+// bare id string / null when unpopulated — only the populated-object form
+// yields a renderable mini-card.
+function normalizeParent(p: unknown): PetParentRef | undefined {
+  if (!p || typeof p !== "object") return undefined;
+  const obj = p as Record<string, unknown>;
+  const id = (obj._id ?? obj.id) as string | undefined;
+  const name = obj.name as string | undefined;
+  if (!id || !name) return undefined;
+  return {
+    _id: id,
+    name,
+    category: obj.category as string | undefined,
+    petImages: Array.isArray(obj.petImages)
+      ? (obj.petImages as string[]).filter(Boolean)
+      : Array.isArray(obj.images)
+      ? (obj.images as string[]).filter(Boolean)
+      : [],
+  };
+}
 
-function ageFromDob(dob?: string): string {
-  if (!dob) return "—";
-  const d = new Date(dob);
-  if (Number.isNaN(d.getTime())) return "—";
-  let months =
-    (NOW.getFullYear() - d.getFullYear()) * 12 +
-    (NOW.getMonth() - d.getMonth());
-  if (NOW.getDate() < d.getDate()) months -= 1;
-  if (months < 0) months = 0;
-  if (months >= 12) {
-    const yrs = Math.floor(months / 12);
-    return `${yrs} ${yrs === 1 ? "yr" : "yrs"}`;
-  }
-  return `${months} ${months === 1 ? "mo" : "mos"}`;
+/* ---------- mockup-faithful display helpers ---------- */
+// Age is derived at runtime via ageFromDob (lib/age.ts); ageFromDob returns ""
+// for a missing/invalid dob, so fall back to an em-dash for display parity.
+function ageDisplay(dob?: string): string {
+  return ageFromDob(dob) || "—";
 }
 
 function fmtDob(dob?: string): string {
@@ -84,10 +102,22 @@ function genderLabel(g?: string): string {
   return "—";
 }
 
+// Description-regex fallback for COI. Sanitizes first so rich-text/embed markup
+// in the admin-authored description can't smuggle anything past the match.
 function parseCOI(desc?: string): string | null {
   if (!desc) return null;
-  const m = String(desc).match(/COI:\s*([0-9.]+\s*%?)/i);
+  const m = sanitizeHtml(String(desc)).match(/COI:\s*([0-9.]+\s*%?)/i);
   return m ? m[1].replace(/\s+/g, "") : null;
+}
+
+// Prefer the structured `coi` field when present, else fall back to parsing the
+// description. Returns a display string ("12%" / "0.5%") or null when unknown.
+function resolveCOI(pet: Pet): string | null {
+  if (pet.coi !== undefined && pet.coi !== null && String(pet.coi).trim() !== "") {
+    const raw = String(pet.coi).trim();
+    return raw.endsWith("%") ? raw : `${raw}%`;
+  }
+  return parseCOI(pet.description);
 }
 
 export default async function PetDetailPage({
@@ -103,7 +133,28 @@ export default async function PetDetailPage({
   const emsColor = pet.characteristics?.color || "—";
   const category = pet.category || "Other";
   const cattery = pet.cattery ? pet.cattery.trim() : "";
-  const coi = parseCOI(pet.description);
+  // COI: structured pet.coi preferred, description regex fallback (B4).
+  const coi = resolveCOI(pet);
+
+  // Registry: structured pet.registry preferred, hardcoded default fallback (B5).
+  const registry =
+    pet.registry && String(pet.registry).trim()
+      ? String(pet.registry).trim()
+      : "WCF · CFA";
+
+  // Size / weight from characteristics, surfaced only when present (A5).
+  const size = pet.characteristics?.size
+    ? String(pet.characteristics.size).trim()
+    : "";
+  const weight =
+    typeof pet.characteristics?.weight === "number" &&
+    pet.characteristics.weight > 0
+      ? pet.characteristics.weight
+      : null;
+
+  // Populated parents (A3) — only renderable when the API returned objects.
+  const father = pet.father;
+  const mother = pet.mother;
 
   // neutral litter status string (informational only)
   const litterStatus =
@@ -119,14 +170,16 @@ export default async function PetDetailPage({
   // spec list rows
   const specs: [string, string][] = [
     ["Breed", pet.breed || "Maine Coon"],
-    ["Born", `${fmtDob(pet.dob)} · ${ageFromDob(pet.dob)}`],
+    ["Born", `${fmtDob(pet.dob)} · ${ageDisplay(pet.dob)}`],
     ["Gender", genderLabel(pet.gender)],
     ["Colour (EMS)", emsColor],
     ["Cattery", cattery || "—"],
     ["Category", category],
   ];
+  if (size) specs.push(["Size", size.charAt(0).toUpperCase() + size.slice(1)]);
+  if (weight !== null) specs.push(["Weight", `${weight} kg`]);
   if (coi) specs.push(["COI", coi]);
-  specs.push(["Registry", "WCF · CFA"]);
+  specs.push(["Registry", registry]);
 
   // personality chips
   const personality = (pet.characteristics?.personality ?? []).filter(Boolean);
@@ -285,12 +338,36 @@ export default async function PetDetailPage({
       </div>
 
       {/* pedigree */}
-      {(pet.pedigreeURL ||
+      {(father ||
+        mother ||
+        pet.pedigreeURL ||
         (pet.pedigreeImages && pet.pedigreeImages.length > 0)) && (
         <div className="pedigree">
           <div className="pedigree-inner">
             <span className="label">Pedigree</span>
             <h2 className="font-serif">{pet.name}&rsquo;s bloodline</h2>
+
+            {/* sire / dam linked mini-cards (A3) — gracefully hidden if absent */}
+            {(father || mother) && (
+              <div
+                className="pedigree-row"
+                style={{ gridTemplateColumns: "1fr auto 1fr", marginBottom: 48 }}
+              >
+                {father ? (
+                  <ParentCard parent={father} role="Sire" />
+                ) : (
+                  <div aria-hidden="true" />
+                )}
+                <span className="pedigree-x" aria-hidden="true">
+                  &times;
+                </span>
+                {mother ? (
+                  <ParentCard parent={mother} role="Dam" />
+                ) : (
+                  <div aria-hidden="true" />
+                )}
+              </div>
+            )}
 
             {pet.pedigreeImages && pet.pedigreeImages.length > 0 && (
               <div
@@ -324,6 +401,48 @@ export default async function PetDetailPage({
         </div>
       )}
     </section>
+  );
+}
+
+/* linked sire/dam mini-card (A3): photo + name → parent's detail route */
+function ParentCard({
+  parent,
+  role,
+}: {
+  parent: PetParentRef;
+  role: "Sire" | "Dam";
+}) {
+  const photo = (parent.petImages ?? []).filter(Boolean)[0];
+  return (
+    <Link
+      href={`/kittens/${parent._id}`}
+      className="parent-card is-link"
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      <div
+        className="ph"
+        role="img"
+        aria-label={`${role}: ${parent.name}`}
+        style={{ position: "relative", overflow: "hidden" }}
+      >
+        {photo ? (
+          <Image
+            src={photo}
+            alt={parent.name}
+            fill
+            sizes="108px"
+            className="object-cover"
+            style={{ position: "absolute", inset: 0 }}
+            unoptimized={photo.startsWith("http")}
+          />
+        ) : null}
+      </div>
+      <div>
+        <span className="parent-role">{role}</span>
+        <h3 className="font-serif">{parent.name}</h3>
+        {parent.category ? <p>{parent.category}</p> : null}
+      </div>
+    </Link>
   );
 }
 

@@ -4,30 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Pet } from "@/types/pet";
+import { ageFromDob as ageFromDobShared } from "@/lib/age";
 
 type PetCardProps = {
   pet: Pet;
   href: string;
 };
 
-// "now" anchor for derived age, matching the mockup's 2026-06-12 snapshot
-const NOW = new Date("2026-06-12T00:00:00.000Z");
-
-// derive age from dob as of NOW: years if >= 1, else months
+// Canonical age logic now lives in lib/age.ts (live `new Date()`, not a
+// frozen snapshot). Wrap it to keep the card's "—" placeholder for a
+// missing/invalid dob, preserving the existing rendered output.
 function ageFromDob(dob?: string): string {
-  if (!dob) return "—";
-  const d = new Date(dob);
-  if (Number.isNaN(d.getTime())) return "—";
-  let months =
-    (NOW.getFullYear() - d.getFullYear()) * 12 +
-    (NOW.getMonth() - d.getMonth());
-  if (NOW.getDate() < d.getDate()) months -= 1;
-  if (months < 0) months = 0;
-  if (months >= 12) {
-    const yrs = Math.floor(months / 12);
-    return `${yrs} ${yrs === 1 ? "yr" : "yrs"}`;
-  }
-  return `${months} ${months === 1 ? "mo" : "mos"}`;
+  return ageFromDobShared(dob) || "—";
 }
 
 function fmtDob(dob?: string): string {
