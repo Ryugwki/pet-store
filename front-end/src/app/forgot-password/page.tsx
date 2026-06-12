@@ -33,21 +33,23 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center bg-[#f8f8f8] py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-2">
-            <PawPrint className="h-10 w-10 text-primary" />
+    <div className="min-h-[70vh] flex items-center justify-center bg-background py-16 px-4">
+      <Card className="w-full max-w-md border border-border bg-card shadow-none rounded-none">
+        <CardHeader className="space-y-3 text-center pt-10">
+          <div className="flex justify-center mb-1">
+            <PawPrint className="h-9 w-9 text-[var(--color-bronze)]" />
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <p className="eyebrow">Account Recovery</p>
+          <CardTitle className="font-serif text-3xl font-normal">
             Forgot your password?
           </CardTitle>
-          <CardDescription>
+          <div className="mx-auto h-px w-12 bg-[var(--color-bronze)]" />
+          <CardDescription className="text-muted-foreground">
             Enter your email to receive a password reset link.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-8">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -57,16 +59,24 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="rounded-none border-border"
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button className="w-full" type="submit" disabled={isLoading}>
+          <CardFooter className="flex flex-col px-8 pb-10">
+            <Button
+              className="w-full rounded-none bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] uppercase tracking-[0.18em] text-xs dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
+              type="submit"
+              disabled={isLoading}
+            >
               {isLoading ? "Sending..." : "Send Reset Link"}
             </Button>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-5 text-center text-sm text-muted-foreground">
               Remember your password?{" "}
-              <Link href="/sign-in" className="text-primary hover:underline">
+              <Link
+                href="/sign-in"
+                className="text-[var(--color-bronze-deep)] hover:text-foreground"
+              >
                 Sign in
               </Link>
             </div>

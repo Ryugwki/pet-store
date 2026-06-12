@@ -26,33 +26,38 @@ export default function Section({
 }: SectionProps) {
   return (
     <section
-      className={cn("py-8 md:py-10 bg-background text-foreground", className)}
+      className={cn(
+        "py-14 md:py-20 bg-background text-foreground",
+        className
+      )}
     >
       <div className={cn("container mx-auto px-4", containerClassName)}>
         {(title || subtitle || actions) && (
           <div
             className={cn(
-              "mb-6 flex flex-col gap-2 md:mb-8",
+              "mb-10 flex flex-col gap-3 md:mb-14",
               center ? "items-center text-center" : "items-start",
               headerClassName
             )}
           >
             {title && (
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+              <h2 className="font-serif text-3xl md:text-4xl font-light tracking-tight">
                 {title}
               </h2>
             )}
             {title && (
               <div
                 className={cn(
-                  "h-1 w-52 rounded-full mt-2",
-                  center && "mx-auto",
-                  "bg-[currentColor]"
+                  "h-px w-14 mt-1 rule-bronze",
+                  center && "mx-auto"
                 )}
+                aria-hidden="true"
               />
             )}
             {subtitle && (
-              <p className="text-muted-foreground max-w-2xl">{subtitle}</p>
+              <p className="text-muted-foreground max-w-2xl leading-relaxed">
+                {subtitle}
+              </p>
             )}
             {actions && <div className={cn(center && "mt-1")}>{actions}</div>}
           </div>

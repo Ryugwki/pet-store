@@ -84,15 +84,15 @@ export default function CenteredAlert({
       >
         <Alert
           variant={banner.variant}
-          className="relative flex flex-col gap-2 px-4 py-3 rounded-xl shadow-lg border border-black/10 bg-white text-gray-900 [&>svg]:left-0 [&>svg]:top-0 [&>svg~*]:pl-0"
+          className="relative flex flex-col gap-2 px-4 py-3 rounded-sm shadow-lg border border-border bg-card text-foreground [&>svg]:left-0 [&>svg]:top-0 [&>svg~*]:pl-0"
           role="status"
           aria-live="polite"
         >
           <div className="flex items-start gap-3">
             {banner.variant === "destructive" ? (
-              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-[var(--color-bronze-deep)] mt-0.5" />
             ) : (
-              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[var(--color-bronze)] mt-0.5" />
             )}
             <div className="mr-2 flex flex-col">
               <AlertTitle>{banner.title}</AlertTitle>
@@ -103,10 +103,12 @@ export default function CenteredAlert({
           </div>
           <div className="flex items-center justify-end"></div>
           {/* progress track & bar at the bottom */}
-          <div className="mt-1 h-1 bg-gray-200/80 overflow-hidden">
+          <div className="mt-1 h-1 bg-[var(--color-border)] overflow-hidden">
             <div
               className={`h-full w-full ${
-                banner.variant === "destructive" ? "bg-red-500" : "bg-blue-500"
+                banner.variant === "destructive"
+                  ? "bg-[var(--color-bronze-deep)]"
+                  : "bg-[var(--color-bronze)]"
               } ${
                 progressToZero ? "animate-[bar-shrink_linear_forwards]" : ""
               } ${durationClass}`}

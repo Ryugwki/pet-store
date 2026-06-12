@@ -494,27 +494,43 @@ export default function AdminPetsPage() {
         onClose={() => setBanner(null)}
         durationMs={5000}
       />
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Pets</h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow">Cattery Registry</p>
+          <h1 className="mt-1 font-serif text-3xl">Pets</h1>
+          <span className="rule-bronze mt-3 block h-px w-24" />
+        </div>
         <Button
-          className="bg-red-700 hover:bg-red-600 text-white"
+          className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze)]"
           onClick={openAdd}
         >
           <Plus className="h-4 w-4 mr-2" /> Add Pet
         </Button>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="text-sm text-[var(--color-bronze-deep)]">{error}</p>
+      )}
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden border border-border bg-card">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Cattery</TableHead>
-              <TableHead className="w-[180px]">Actions</TableHead>
+            <TableRow className="bg-muted/60 hover:bg-muted/60">
+              <TableHead className="eyebrow text-muted-foreground">
+                Name
+              </TableHead>
+              <TableHead className="eyebrow text-muted-foreground">
+                Gender
+              </TableHead>
+              <TableHead className="eyebrow text-muted-foreground">
+                Category
+              </TableHead>
+              <TableHead className="eyebrow text-muted-foreground">
+                Cattery
+              </TableHead>
+              <TableHead className="eyebrow w-[180px] text-muted-foreground">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -529,20 +545,27 @@ export default function AdminPetsPage() {
               </TableRow>
             ) : rows.length > 0 ? (
               rows.map(({ mapped, categoryDisplay }) => (
-                <TableRow key={mapped.id}>
-                  <TableCell className="font-medium">{mapped.name}</TableCell>
-                  <TableCell className="capitalize">{mapped.gender}</TableCell>
-                  <TableCell className="capitalize">
+                <TableRow key={mapped.id} className="border-border">
+                  <TableCell className="font-serif text-base font-medium text-foreground">
+                    {mapped.name}
+                  </TableCell>
+                  <TableCell className="capitalize text-muted-foreground">
+                    {mapped.gender}
+                  </TableCell>
+                  <TableCell className="capitalize text-muted-foreground">
                     {categoryDisplay}
                   </TableCell>
-                  <TableCell className="capitalize">{mapped.cattery}</TableCell>
+                  <TableCell className="capitalize text-muted-foreground">
+                    {mapped.cattery}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => openEdit(mapped)}
-                        className="text-white hover:bg-blue-600 border-blue-700 bg-blue-700 border hover:border-blue-600"
+                        aria-label={`Edit ${mapped.name}`}
+                        className="border border-border bg-transparent text-[var(--color-bronze-deep)] hover:border-[var(--color-bronze)] hover:bg-[var(--color-bronze)] hover:text-[#faf7f2]"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -550,7 +573,8 @@ export default function AdminPetsPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => setConfirmDeleteId(mapped.id)}
-                        className="text-white hover:bg-red-600 border-red-700 bg-red-700 border hover:border-red-600"
+                        aria-label={`Delete ${mapped.name}`}
+                        className="border border-border bg-transparent text-foreground hover:border-[#26221c] hover:bg-[#26221c] hover:text-[#faf7f2] dark:hover:border-[#faf7f2] dark:hover:bg-[#faf7f2] dark:hover:text-[#26221c]"
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
@@ -581,8 +605,10 @@ export default function AdminPetsPage() {
           className="bg-card text-foreground border border-border"
         >
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this pet?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="font-serif text-xl">
+              Delete this pet?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               This action cannot be undone. This will permanently delete the
               pet.
             </AlertDialogDescription>
@@ -590,7 +616,7 @@ export default function AdminPetsPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700 border border-black"
+              className="border border-border bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze)]"
               onClick={() =>
                 confirmDeleteId && handleDeleteConfirmed(confirmDeleteId)
               }
@@ -613,11 +639,17 @@ export default function AdminPetsPage() {
           hideOverlay
         >
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit Pet" : "Add Pet"}</DialogTitle>
+            <p className="eyebrow">Cattery Registry</p>
+            <DialogTitle className="font-serif text-2xl">
+              {editing ? "Edit Pet" : "Add Pet"}
+            </DialogTitle>
+            <span className="rule-bronze mt-2 block h-px w-16" />
           </DialogHeader>
           <div className="grid gap-4 py-2 md:grid-cols-2">
             <div className="grid gap-1">
-              <Label htmlFor="petImages">Pet Images</Label>
+              <Label htmlFor="petImages" className="eyebrow">
+                Pet Images
+              </Label>
               <input
                 id="petImages"
                 type="file"
@@ -626,14 +658,14 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("pet")}
                 aria-label="Pet images"
                 title="Select pet images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#26221c] file:text-[#faf7f2] hover:file:bg-[var(--color-bronze-deep)] dark:file:bg-[#faf7f2] dark:file:text-[#26221c] dark:hover:file:bg-[var(--color-bronze)]"
               />
               {(existingPetImages.length > 0 || newPetImages.length > 0) && (
                 <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {existingPetImages.map((url, idx) => (
                     <div
                       key={`ex-pet-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={url}
@@ -656,7 +688,7 @@ export default function AdminPetsPage() {
                   {newPetImages.map((img, idx) => (
                     <div
                       key={`new-pet-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={img.preview}
@@ -682,7 +714,9 @@ export default function AdminPetsPage() {
 
             {/* Pedigree Images */}
             <div className="grid gap-1">
-              <Label htmlFor="pedigreeImages">Pedigree Images</Label>
+              <Label htmlFor="pedigreeImages" className="eyebrow">
+                Pedigree Images
+              </Label>
               <input
                 id="pedigreeImages"
                 type="file"
@@ -691,7 +725,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("pedigree")}
                 aria-label="Pedigree images"
                 title="Select pedigree images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#26221c] file:text-[#faf7f2] hover:file:bg-[var(--color-bronze-deep)] dark:file:bg-[#faf7f2] dark:file:text-[#26221c] dark:hover:file:bg-[var(--color-bronze)]"
               />
               {(existingPedigreeImages.length > 0 ||
                 newPedigreeImages.length > 0) && (
@@ -699,7 +733,7 @@ export default function AdminPetsPage() {
                   {existingPedigreeImages.map((url, idx) => (
                     <div
                       key={`ex-ped-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={url}
@@ -722,7 +756,7 @@ export default function AdminPetsPage() {
                   {newPedigreeImages.map((img, idx) => (
                     <div
                       key={`new-ped-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={img.preview}
@@ -748,7 +782,9 @@ export default function AdminPetsPage() {
 
             {/* Awards Images */}
             <div className="grid gap-1">
-              <Label htmlFor="awardsImages">Awards Images</Label>
+              <Label htmlFor="awardsImages" className="eyebrow">
+                Awards Images
+              </Label>
               <input
                 id="awardsImages"
                 type="file"
@@ -757,7 +793,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("awards")}
                 aria-label="Awards images"
                 title="Select awards images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#26221c] file:text-[#faf7f2] hover:file:bg-[var(--color-bronze-deep)] dark:file:bg-[#faf7f2] dark:file:text-[#26221c] dark:hover:file:bg-[var(--color-bronze)]"
               />
               {(existingAwardsImages.length > 0 ||
                 newAwardsImages.length > 0) && (
@@ -765,7 +801,7 @@ export default function AdminPetsPage() {
                   {existingAwardsImages.map((url, idx) => (
                     <div
                       key={`ex-aw-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={url}
@@ -788,7 +824,7 @@ export default function AdminPetsPage() {
                   {newAwardsImages.map((img, idx) => (
                     <div
                       key={`new-aw-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={img.preview}
@@ -814,7 +850,9 @@ export default function AdminPetsPage() {
 
             {/* Certificate Images */}
             <div className="grid gap-1">
-              <Label htmlFor="certificateImages">Certificate Images</Label>
+              <Label htmlFor="certificateImages" className="eyebrow">
+                Certificate Images
+              </Label>
               <input
                 id="certificateImages"
                 type="file"
@@ -823,7 +861,7 @@ export default function AdminPetsPage() {
                 onChange={fileSelectorFor("certificate")}
                 aria-label="Certificate images"
                 title="Select certificate images"
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-700 file:text-white hover:file:bg-red-600"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#26221c] file:text-[#faf7f2] hover:file:bg-[var(--color-bronze-deep)] dark:file:bg-[#faf7f2] dark:file:text-[#26221c] dark:hover:file:bg-[var(--color-bronze)]"
               />
               {(existingCertificateImages.length > 0 ||
                 newCertificateImages.length > 0) && (
@@ -831,7 +869,7 @@ export default function AdminPetsPage() {
                   {existingCertificateImages.map((url, idx) => (
                     <div
                       key={`ex-cert-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={url}
@@ -854,7 +892,7 @@ export default function AdminPetsPage() {
                   {newCertificateImages.map((img, idx) => (
                     <div
                       key={`new-cert-${idx}`}
-                      className="relative group rounded-md overflow-hidden border h-24"
+                      className="relative group rounded-md overflow-hidden border border-border h-24"
                     >
                       <Image
                         src={img.preview}
@@ -879,7 +917,9 @@ export default function AdminPetsPage() {
             </div>
 
             <div className="grid gap-1">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name" className="eyebrow">
+                Name
+              </Label>
               <Input
                 id="name"
                 value={form.name}
@@ -890,7 +930,9 @@ export default function AdminPetsPage() {
             </div>
             <div className="grid gap-1 grid-cols-1 sm:grid-cols-2 gap-x-4 md:col-span-2">
               <div className="grid gap-1">
-                <Label htmlFor="breed">Breed</Label>
+                <Label htmlFor="breed" className="eyebrow">
+                  Breed
+                </Label>
                 <Input
                   id="breed"
                   value={form.breed}
@@ -900,7 +942,9 @@ export default function AdminPetsPage() {
                 />
               </div>
               <div className="grid gap-1">
-                <Label htmlFor="age">Age (years)</Label>
+                <Label htmlFor="age" className="eyebrow">
+                  Age (years)
+                </Label>
                 <Input
                   id="age"
                   type="number"
@@ -913,11 +957,13 @@ export default function AdminPetsPage() {
             </div>
             <div className="grid gap-1 grid-cols-1 sm:grid-cols-3 gap-x-4">
               <div className="grid gap-1">
-                <Label htmlFor="gender">Gender</Label>
+                <Label htmlFor="gender" className="eyebrow">
+                  Gender
+                </Label>
                 <select
                   id="gender"
                   aria-label="Gender"
-                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground"
                   value={form.gender}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -935,7 +981,7 @@ export default function AdminPetsPage() {
             {form.category === "Kittens" && (
               <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:col-span-2 [&_*]:min-w-0">
                 <div className="grid gap-1">
-                  <Label>Father</Label>
+                  <Label className="eyebrow">Father</Label>
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -978,7 +1024,7 @@ export default function AdminPetsPage() {
                   </div>
                 </div>
                 <div className="grid gap-1">
-                  <Label>Mother</Label>
+                  <Label className="eyebrow">Mother</Label>
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -1024,11 +1070,13 @@ export default function AdminPetsPage() {
             )}
 
             <div className="grid gap-1">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category" className="eyebrow">
+                Category
+              </Label>
               <select
                 id="category"
                 aria-label="Category"
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground"
                 value={form.category}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -1048,7 +1096,9 @@ export default function AdminPetsPage() {
               </select>
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="cattery">Cattery</Label>
+              <Label htmlFor="cattery" className="eyebrow">
+                Cattery
+              </Label>
               <Input
                 id="cattery"
                 value={form.cattery}
@@ -1058,7 +1108,9 @@ export default function AdminPetsPage() {
               />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="dob">DoB</Label>
+              <Label htmlFor="dob" className="eyebrow">
+                DoB
+              </Label>
               <Input
                 id="dob"
                 type="date"
@@ -1071,7 +1123,9 @@ export default function AdminPetsPage() {
               />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="color">Color</Label>
+              <Label htmlFor="color" className="eyebrow">
+                Color
+              </Label>
               <Input
                 id="color"
                 value={form.color}
@@ -1081,7 +1135,9 @@ export default function AdminPetsPage() {
               />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="litter">Litter</Label>
+              <Label htmlFor="litter" className="eyebrow">
+                Litter
+              </Label>
               <Input
                 id="litter"
                 placeholder="e.g., Kit A, Kit B"
@@ -1095,7 +1151,9 @@ export default function AdminPetsPage() {
               </p>
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="pedigreeURL">Pedigree URL</Label>
+              <Label htmlFor="pedigreeURL" className="eyebrow">
+                Pedigree URL
+              </Label>
               <Input
                 id="pedigreeURL"
                 placeholder="https://..."
@@ -1106,7 +1164,9 @@ export default function AdminPetsPage() {
               />
             </div>
             <div className="grid gap-1 md:col-span-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="eyebrow">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 rows={4}
@@ -1129,7 +1189,7 @@ export default function AdminPetsPage() {
             </Button>
             <Button
               onClick={handleSubmit}
-              className="bg-red-700 hover:bg-red-600 text-white"
+              className="bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze)]"
               disabled={submitting}
             >
               {submitting ? "Saving..." : editing ? "Save" : "Create"}

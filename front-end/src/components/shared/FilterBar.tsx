@@ -16,11 +16,18 @@ export default function FilterBar({ onSearch, onChange }: FilterBarProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <div className="flex gap-3">
+    <div className="container mx-auto px-4 py-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between bg-card border-y border-border">
+      <div className="flex flex-col gap-1.5">
+        <label
+          htmlFor="filter-color"
+          className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+        >
+          Color
+        </label>
         <select
+          id="filter-color"
           aria-label="Filter by color"
-          className="border border-[#e5e7eb] rounded-md px-3 py-2 bg-white"
+          className="border border-border rounded-none bg-background text-foreground font-serif text-base px-3 py-2 focus:outline-none focus:border-[var(--color-bronze)] focus:ring-1 focus:ring-[var(--color-bronze)] transition-colors"
           value={color}
           onChange={(e) => {
             setColor(e.target.value);
@@ -34,16 +41,25 @@ export default function FilterBar({ onSearch, onChange }: FilterBarProps) {
         </select>
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          aria-label="Search by name"
-          className="border border-[#e5e7eb] rounded-md px-3 py-2 w-64"
-          placeholder="Search by name..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
+      <div className="flex items-end gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="filter-search"
+            className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+          >
+            Search
+          </label>
+          <input
+            id="filter-search"
+            aria-label="Search by name"
+            className="border border-border rounded-none bg-background text-foreground px-3 py-2 w-64 focus:outline-none focus:border-[var(--color-bronze)] focus:ring-1 focus:ring-[var(--color-bronze)] transition-colors placeholder:text-muted-foreground"
+            placeholder="Search by name..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </div>
         <button
-          className="border border-[#fca5a5] text-[#b91c1c] hover:bg-[#fca5a5] hover:text-[#b91c1c] rounded-md px-4 py-2"
+          className="border border-[#26221c] dark:border-border bg-[#26221c] dark:bg-[var(--color-bronze)] text-[#faf7f2] dark:text-[#16130f] text-[11px] font-semibold uppercase tracking-[0.18em] px-5 py-2.5 transition-colors hover:bg-[var(--color-bronze-deep)] hover:border-[var(--color-bronze-deep)]"
           onClick={() => onSearch?.(q)}
         >
           Search

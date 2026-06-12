@@ -135,16 +135,18 @@ export default function ProfilePage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-lg hover:bg-muted"
+              className="rounded-none border border-border hover:bg-muted"
             >
               <ArrowLeft size={20} className="text-muted-foreground" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">
+            <p className="eyebrow mb-1">Your Account</p>
+            <h1 className="font-serif text-3xl font-normal text-foreground">
               Profile Settings
             </h1>
-            <p className="text-muted-foreground">
+            <div className="mt-3 h-px w-16 bg-[var(--color-bronze)]" />
+            <p className="text-muted-foreground mt-3">
               Manage your account information and preferences
             </p>
           </div>
@@ -152,10 +154,10 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Overview Card */}
-          <Card className="shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="rounded-none border border-border bg-card shadow-none transition-all duration-300">
             <CardHeader className="text-center">
               <div className="relative mx-auto">
-                <Avatar className="h-24 w-24 border-4 border-border shadow-md">
+                <Avatar className="h-24 w-24 border border-border shadow-none">
                   <AvatarImage
                     src={(isEditing ? edited.avatar : profile?.avatar) || ""}
                     alt={profile?.name || "User avatar"}
@@ -167,10 +169,10 @@ export default function ProfilePage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute -bottom-2 -right-2 rounded-full bg-card shadow-md hover:bg-muted border border-border"
+                  className="absolute -bottom-2 -right-2 rounded-full bg-card shadow-none hover:bg-muted border border-[var(--color-bronze)]"
                   onClick={pickAvatar}
                 >
-                  <Camera size={16} className="text-muted-foreground" />
+                  <Camera size={16} className="text-[var(--color-bronze-deep)]" />
                 </Button>
                 <input
                   ref={fileRef}
@@ -181,10 +183,12 @@ export default function ProfilePage() {
                   onChange={onAvatarChange}
                 />
               </div>
-              <CardTitle className="text-xl">
+              <CardTitle className="font-serif text-2xl font-normal">
                 {profile?.name || (loading ? "" : "Unnamed")}
               </CardTitle>
-              <p className="text-sky-600 font-medium">{profile?.role}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-bronze)]">
+                {profile?.role}
+              </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3 text-sm">
@@ -213,13 +217,15 @@ export default function ProfilePage() {
 
           {/* Edit Profile Form */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-lg hover:shadow-xl transition-all duration-300">
+            <Card className="rounded-none border border-border bg-card shadow-none transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Personal Information</CardTitle>
+                <CardTitle className="font-serif text-2xl font-normal">
+                  Personal Information
+                </CardTitle>
                 {!isEditing ? (
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="rounded-none bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] uppercase tracking-[0.18em] text-xs dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
                   >
                     Edit Profile
                   </Button>
@@ -228,14 +234,14 @@ export default function ProfilePage() {
                     <Button
                       variant="outline"
                       onClick={onCancel}
-                      className="border-border hover:bg-muted"
+                      className="rounded-none border-border hover:bg-muted uppercase tracking-[0.18em] text-xs"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={onSave}
                       disabled={saving}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                      className="rounded-none bg-[#26221c] text-[#faf7f2] hover:bg-[var(--color-bronze-deep)] uppercase tracking-[0.18em] text-xs dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[var(--color-bronze-soft)]"
                     >
                       <Save size={16} className="mr-2" />
                       {saving ? "Saving..." : "Save Changes"}
@@ -257,7 +263,7 @@ export default function ProfilePage() {
                         setEdited((p) => ({ ...p, name: e.target.value }))
                       }
                       disabled={!isEditing}
-                      className="disabled:bg-muted/40"
+                      className="rounded-none border-border disabled:bg-muted/40"
                     />
                   </div>
                 </div>
@@ -266,7 +272,7 @@ export default function ProfilePage() {
 
                 {/* Contact Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <h3 className="font-serif text-lg font-normal text-foreground">
                     Contact Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -279,7 +285,7 @@ export default function ProfilePage() {
                         type="email"
                         value={profile?.email || ""}
                         disabled
-                        className="disabled:bg-muted/40"
+                        className="rounded-none border-border disabled:bg-muted/40"
                       />
                     </div>
                   </div>
@@ -289,7 +295,7 @@ export default function ProfilePage() {
 
                 {/* Address Information (not available) */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <h3 className="font-serif text-lg font-normal text-foreground">
                     Address Information
                   </h3>
                   <p className="text-sm text-muted-foreground">
@@ -301,7 +307,7 @@ export default function ProfilePage() {
 
                 {/* Account Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <h3 className="font-serif text-lg font-normal text-foreground">
                     Account Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -313,7 +319,7 @@ export default function ProfilePage() {
                         id="role"
                         value={profile?.role || ""}
                         disabled
-                        className="disabled:bg-muted/40"
+                        className="rounded-none border-border disabled:bg-muted/40"
                       />
                     </div>
                     <div className="space-y-2">
@@ -328,7 +334,7 @@ export default function ProfilePage() {
                             : ""
                         }
                         disabled
-                        className="disabled:bg-muted/40"
+                        className="rounded-none border-border disabled:bg-muted/40"
                       />
                     </div>
                   </div>
@@ -337,26 +343,28 @@ export default function ProfilePage() {
             </Card>
 
             {/* Security Settings Card */}
-            <Card className="shadow-lg hover:shadow-xl transition-all duration-300">
+            <Card className="rounded-none border border-border bg-card shadow-none transition-all duration-300">
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
+                <CardTitle className="font-serif text-2xl font-normal">
+                  Security Settings
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-border hover:bg-muted"
+                  className="w-full justify-start rounded-none border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 >
                   Change Password
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-border hover:bg-muted"
+                  className="w-full justify-start rounded-none border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 >
                   Two-Factor Authentication
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start border-border hover:bg-muted"
+                  className="w-full justify-start rounded-none border-border hover:bg-muted hover:border-[var(--color-bronze)]"
                 >
                   Login History
                 </Button>

@@ -65,11 +65,11 @@ function ToolbarButton({
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-sm
-        transition-colors hover:bg-red-50 hover:border-red-300
+        transition-colors hover:border-[var(--color-bronze)] hover:text-[var(--color-bronze-deep)]
         ${
           active
-            ? "bg-red-50 border-red-400 text-red-700"
-            : "bg-white border-gray-300"
+            ? "bg-muted border-[var(--color-bronze)] text-[var(--color-bronze-deep)]"
+            : "bg-card border-border text-foreground"
         }
       `}
     >
@@ -198,7 +198,7 @@ export default function RichTextEditor({
   return (
     <div className={className}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b p-2 bg-white">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border p-2 bg-card">
         <ToolbarButton
           title="Bold"
           active={formats.bold}
@@ -233,11 +233,11 @@ export default function RichTextEditor({
           </ToolbarButton>
           {open.align && (
             <div
-              className="absolute z-20 mt-1 w-44 rounded-md border border-gray-300 bg-white p-1 shadow-lg"
+              className="absolute z-20 mt-1 w-44 rounded-md border border-border bg-card p-1 shadow-lg"
               onMouseDown={(e) => e.preventDefault()}
             >
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setAlign("left");
                   setOpen((o) => ({ ...o, align: false }));
@@ -246,7 +246,7 @@ export default function RichTextEditor({
                 <AlignLeft className="h-4 w-4" /> Left
               </button>
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setAlign("center");
                   setOpen((o) => ({ ...o, align: false }));
@@ -255,7 +255,7 @@ export default function RichTextEditor({
                 <AlignCenter className="h-4 w-4" /> Center
               </button>
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setAlign("right");
                   setOpen((o) => ({ ...o, align: false }));
@@ -264,7 +264,7 @@ export default function RichTextEditor({
                 <AlignRight className="h-4 w-4" /> Right
               </button>
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setAlign("justify");
                   setOpen((o) => ({ ...o, align: false }));
@@ -286,11 +286,11 @@ export default function RichTextEditor({
           </ToolbarButton>
           {open.list && (
             <div
-              className="absolute z-20 mt-1 w-44 rounded-md border border-gray-300 bg-white p-1 shadow-lg"
+              className="absolute z-20 mt-1 w-44 rounded-md border border-border bg-card p-1 shadow-lg"
               onMouseDown={(e) => e.preventDefault()}
             >
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setList("bullet");
                   setOpen((o) => ({ ...o, list: false }));
@@ -299,7 +299,7 @@ export default function RichTextEditor({
                 <ListIcon className="h-4 w-4" /> Bulleted list
               </button>
               <button
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
                 onClick={() => {
                   setList("ordered");
                   setOpen((o) => ({ ...o, list: false }));
@@ -327,14 +327,16 @@ export default function RichTextEditor({
           </ToolbarButton>
           {open.size && (
             <div
-              className="absolute z-20 mt-1 w-28 rounded-md border border-gray-300 bg-white p-1 shadow-lg"
+              className="absolute z-20 mt-1 w-28 rounded-md border border-border bg-card p-1 shadow-lg"
               onMouseDown={(e) => e.preventDefault()}
             >
               {sizes.map((s) => (
                 <button
                   key={s.value}
-                  className={`flex w-full items-center justify-between rounded px-2 py-1.5 hover:bg-gray-100 ${
-                    (formats.size ?? "") === s.value ? "text-red-700" : ""
+                  className={`flex w-full items-center justify-between rounded px-2 py-1.5 hover:bg-muted ${
+                    (formats.size ?? "") === s.value
+                      ? "text-[var(--color-bronze-deep)]"
+                      : ""
                   }`}
                   onClick={() => {
                     setSize(s.value);
@@ -362,7 +364,7 @@ export default function RichTextEditor({
         </div>
 
         <div className="flex items-center gap-2 ml-2">
-          <label className="text-xs text-gray-500">Text</label>
+          <label className="text-xs text-muted-foreground">Text</label>
           <Input
             type="color"
             className="w-10 p-1 h-8"
@@ -370,7 +372,7 @@ export default function RichTextEditor({
             value={(formats.color as string) || "#000000"}
             onChange={(e) => quillRef.current?.format("color", e.target.value)}
           />
-          <label className="text-xs text-gray-500">Bg</label>
+          <label className="text-xs text-muted-foreground">Bg</label>
           <Input
             type="color"
             className="w-10 p-1 h-8"

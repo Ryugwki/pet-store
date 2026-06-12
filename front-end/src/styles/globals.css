@@ -1,34 +1,99 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ============================================================
+   Heritage Editorial design tokens (Option A)
+   Ivory / charcoal / bronze. Mapped onto the existing
+   --color-* names so every bridge class + the primary accent
+   shift palette automatically across the whole app.
+   ============================================================ */
 :root {
-  --color-primary: #cf2e2e;
-  --color-primary-light: #fca5a5;
-  --color-primary-dark: #b91c1c;
-  --color-background: #fff;
-  --color-background-muted: #f8f8f8;
-  --color-border: #e5e7eb;
-  --color-card: #fff;
-  --color-card-muted: #f3f3f3;
-  --color-text: #222;
-  --color-text-muted: #888;
-  --color-footer-bg: #f8f8f8;
+  /* bronze accent replaces the old red primary */
+  --color-primary: #a07c45;
+  --color-primary-light: #c8ad85;
+  --color-primary-dark: #846332;
+  /* surfaces */
+  --color-background: #faf7f2; /* ivory */
+  --color-background-muted: #f3ede2; /* cream panel */
+  --color-border: #e6decf; /* hairline */
+  --color-card: #fffdf8; /* paper */
+  --color-card-muted: #f3ede2;
+  --color-text: #26221c; /* charcoal */
+  --color-text-muted: #7a7163;
+  --color-footer-bg: #16130f; /* deep charcoal footer */
+  /* extra heritage tokens */
+  --color-ink-soft: #4d463c;
+  --color-bronze: #a07c45;
+  --color-bronze-deep: #846332;
+  --color-bronze-soft: #c8ad85;
+  /* type */
+  --font-serif: var(--font-serif), "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans), "Inter", system-ui, sans-serif;
 }
 
 .dark {
-  --color-background: #0b0f14;
-  --color-background-muted: #0f1520;
-  --color-border: #1f2937;
-  --color-card: #0f1520;
-  --color-card-muted: #0b0f14;
-  --color-text: #eef2f7;
-  --color-text-muted: #94a3b8;
-  --color-footer-bg: #0f1520;
+  --color-primary: #c8ad85;
+  --color-primary-light: #d8c4a3;
+  --color-primary-dark: #a07c45;
+  --color-background: #16130f;
+  --color-background-muted: #1d1916;
+  --color-border: #2c2925;
+  --color-card: #211d18;
+  --color-card-muted: #16130f;
+  --color-text: #ece8e1;
+  --color-text-muted: #9b948a;
+  --color-footer-bg: #0e0d0b;
+  --color-ink-soft: #cfc7bb;
+  --color-bronze: #c8ad85;
+  --color-bronze-deep: #b79a6f;
+  --color-bronze-soft: #8a6f48;
 }
 
 body {
   background: var(--color-background);
   color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Serif display face for headings + opt-in .font-serif */
+h1,
+h2,
+h3,
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Heritage helpers shared across pages */
+.text-primary {
+  color: var(--color-primary);
+}
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.border-primary {
+  border-color: var(--color-primary);
+}
+.text-bronze {
+  color: var(--color-bronze);
+}
+.text-bronze-deep {
+  color: var(--color-bronze-deep);
+}
+.bg-footer-fg {
+  color: #faf7f2;
+}
+/* small-caps editorial eyebrow label */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+}
+/* the heading + bronze underline motif (replaces old red bars) */
+.rule-bronze {
+  background-color: var(--color-bronze);
 }
 
 /* Utility glue so Tailwind classes benefit from CSS variables */

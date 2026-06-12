@@ -22,15 +22,18 @@ export default function EmptyState({
   return (
     <div
       className={cn(
-        "w-full rounded-xl border bg-card text-card-foreground p-8 grid place-items-center",
+        "w-full rounded-sm border border-border bg-card text-foreground p-12 grid place-items-center",
         className
       )}
     >
-      <div className="flex flex-col items-center text-center gap-3 max-w-md">
-        {icon && <div className="text-muted-foreground">{icon}</div>}
-        <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="flex flex-col items-center text-center gap-4 max-w-md">
+        {icon && <div className="text-[var(--color-bronze-soft)]">{icon}</div>}
+        <h3 className="font-serif text-2xl font-normal">{title}</h3>
+        <div className="h-px w-12 rule-bronze" aria-hidden="true" />
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {description}
+          </p>
         )}
         {typeof action === "object" && action && "label" in action ? (
           <Button className="mt-1" onClick={action.onClick}>

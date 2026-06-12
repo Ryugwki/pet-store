@@ -99,15 +99,37 @@ export default function FemalesPage() {
         />
       )}
       <Section>
+        <div className="max-w-6xl mx-auto mb-12 text-center md:mb-16">
+          <span className="eyebrow block">The Cattery</span>
+          <h2 className="font-serif mt-4 text-3xl font-normal tracking-tight md:text-4xl">
+            {hero.title || "Available Females"}
+          </h2>
+          <span
+            aria-hidden="true"
+            className="rule-bronze mx-auto mt-5 block h-px w-14"
+          />
+          <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
+            {hero.subtitle || "Elegant queens with sweet temperaments."}
+          </p>
+        </div>
         {data.length === 0 ? (
           <EmptyState description="No queens available right now." />
         ) : (
-          <div className="max-w-6xl mx-auto space-y-10">
+          <div className="max-w-6xl mx-auto space-y-16">
             {groups.map(([cattery, pets]) => (
               <div key={cattery} className="w-full">
-                <h3 className="text-xl font-semibold tracking-tight mb-4 text-center">
-                  {cattery}
-                </h3>
+                <div className="mb-10 flex items-baseline gap-6">
+                  <h3 className="font-serif text-2xl font-normal tracking-tight">
+                    {cattery}
+                  </h3>
+                  <span
+                    aria-hidden="true"
+                    className="h-px flex-1 bg-border"
+                  />
+                  <span className="eyebrow shrink-0">
+                    {pets.length} {pets.length === 1 ? "Cat" : "Cats"}
+                  </span>
+                </div>
                 <div className="grid justify-center grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-6">
                   {pets.map((pet) => {
                     const mapped: Pet = {

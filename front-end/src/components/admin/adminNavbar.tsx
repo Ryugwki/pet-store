@@ -54,9 +54,11 @@ export default function AdminNavbar() {
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <PawPrint className="h-6 w-6 text-primary" />
-            <span className="hidden sm:inline-block font-bold text-xl">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--color-bronze)]">
+              <PawPrint className="h-5 w-5 text-[#fffdf8]" />
+            </span>
+            <span className="hidden sm:inline-block font-serif font-semibold text-xl tracking-tight">
               LilyTrinh & DrogonCoon Cattery
             </span>
           </Link>
@@ -68,7 +70,7 @@ export default function AdminNavbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-black hover:bg-gray-200"
+              className="text-foreground hover:bg-muted"
               onClick={() => setIsSearchOpen(true)}
             >
               <Search className="h-5 w-5" />
@@ -103,7 +105,7 @@ export default function AdminNavbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-black hover:bg-gray-200"
+                    className="text-foreground hover:bg-muted"
                   >
                     Sign In
                   </Button>
@@ -111,7 +113,7 @@ export default function AdminNavbar() {
                 <Link href="/sign-up">
                   <Button
                     size="sm"
-                    className="bg-red-700 hover:bg-red-500 text-white"
+                    className="bg-[#26221c] text-[#faf7f2] hover:bg-[#3a342b] dark:bg-[#faf7f2] dark:text-[#26221c] dark:hover:bg-[#e6ddcd]"
                   >
                     Sign Up
                   </Button>
@@ -120,7 +122,7 @@ export default function AdminNavbar() {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Card className="group flex items-center gap-0 p-2 rounded-lg border border-gray-200 hover:shadow-md bg-card">
+                  <Card className="group flex items-center gap-0 p-2 rounded-md border border-border hover:border-[var(--color-bronze)] transition-colors bg-card">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
                         {user?.avatar ? (
@@ -131,12 +133,12 @@ export default function AdminNavbar() {
                             alt="Profile"
                           />
                         )}
-                        <AvatarFallback className="bg-primary text-primary-foreground">
+                        <AvatarFallback className="bg-[var(--color-bronze)] text-[#fffdf8]">
                           {user?.name?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-left">
-                        <div className="font-semibold text-card-foreground group-hover:text-primary">
+                        <div className="font-semibold text-card-foreground group-hover:text-[var(--color-bronze-deep)]">
                           {user?.name || "User"}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -145,7 +147,7 @@ export default function AdminNavbar() {
                       </div>
                       <ChevronDown
                         size={16}
-                        className="text-muted-foreground group-hover:text-primary ml-1"
+                        className="text-muted-foreground group-hover:text-[var(--color-bronze-deep)] ml-1"
                       />
                     </div>
                   </Card>
@@ -153,7 +155,7 @@ export default function AdminNavbar() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={0}
-                  className="z-[60] w-48 shadow-lg border border-border bg-popover rounded-lg p-1 bg-white mt-2"
+                  className="z-[60] w-48 shadow-lg border border-border bg-popover rounded-md p-1 mt-2"
                 >
                   <DropdownMenuItem
                     onClick={handleProfileClick}
@@ -187,13 +189,13 @@ export default function AdminNavbar() {
                       </span>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuSeparator className="my-1 bg-gray-300" />
+                  <DropdownMenuSeparator className="my-1 bg-border" />
                   <DropdownMenuItem
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-destructive/10"
+                    className="flex items-center gap-3 px-3 py-2 text-[var(--color-bronze-deep)] hover:bg-muted"
                   >
                     <LogOut size={16} />
-                    <span className="text-sm font-medium text-red-600">
+                    <span className="text-sm font-medium text-[var(--color-bronze-deep)]">
                       Logout
                     </span>
                   </DropdownMenuItem>
